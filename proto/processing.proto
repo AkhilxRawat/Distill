@@ -1,0 +1,47 @@
+syntax = "proto3";
+package distill.processing.v1;
+service ProcessingService {
+  // Server-side streaming: the stream ends when stage == COMPLETE or FAILED.
+  rpc ProcessContent(ProcessRequest) returns (stream ProcessResponse);
+}
+enum ProcessStage {
+  PROCESS_STAGE_UNSPECIFIED   = 0;
+  PROCESS_STAGE_SUMMARIZING   = 1;
+  PROCESS_STAGE_EXTRACTING    = 2;
+  PROCESS_STAGE_GENERATING_QA = 3;
+  PROCESS_STAGE_TAGGING       = 4;
+  PROCESS_STAGE_COMPLETE      = 5;
+  PROCESS_STAGE_FAILED        = 6;
+}
+message ProcessRequest {
+  string job_id      = 1;
+  string user_id     = 2;
+  string content     = 3;
+  string source_type = 4;
+}
+message ProcessResponse {
+  string       job_id = 1;
+  ProcessStage stage  = 2;
+  oneof payload {
+    string       text_chunk   = 3;
+    FinalResult  final_result = 4;
+    ProcessError error        = 5;
+  }
+}
+message FinalResult {
+  string          summary           = 1;
+  repeated string key_entities      = 2;
+  repeated QAPair qa_pairs          = 3;
+  repeated string topic_tags        = 4;
+  int32           readability_score = 5;
+  int32           tokens_used       = 6;
+}
+message QAPair {
+  string question = 1;
+  string answer   = 2;
+}
+message ProcessError {
+
+string code    = 1;
+string message = 2;
+}

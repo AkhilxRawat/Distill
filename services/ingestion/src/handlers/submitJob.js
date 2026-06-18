@@ -9,23 +9,19 @@ async function submitJob(call, callback) {
   const { source, source_type, user_id } = call.request;
   const job_id = uuidv4();
 
-  // 1. Create job as QUEUED in storage
   try {
-    await updateStatus(job_id, user_id, source, source_type, 'queued');
+    await setStatus(job_id, 'queued');
   } catch (err) {
     return callback({ code: 13, message: `Failed to create job: ${err.message}` });
   }
 
-  // 2. Return immediately so the caller isn't blocked
   callback(null, { job_id, status: 'JOB_STATUS_QUEUED' });
 
-  // 3. Run the rest of the pipeline asynchronously
   runPipeline(job_id, user_id, source, source_type);
 }
 
 async function runPipeline(job_id, user_id, source, source_type) {
   try {
-    // Fetch content
     await setStatus(job_id, 'fetching');
     let content;
 
@@ -37,7 +33,6 @@ async function runPipeline(job_id, user_id, source, source_type) {
       content = await fetchRawText(source);
     }
 
-    // Hand off to processing
     await setStatus(job_id, 'processing');
     triggerProcessing(job_id, user_id, content, source_type, source);
 
@@ -45,19 +40,6 @@ async function runPipeline(job_id, user_id, source, source_type) {
     console.error(`Pipeline error for job ${job_id}:`, err.message);
     await setStatus(job_id, 'failed', err.message);
   }
-}
-
-// Create the job record in storage (upsert so UpdateJobStatus works)
-function updateStatus(job_id, user_id, source, source_type, status) {
-  return new Promise((res, rej) => {
-    storageClient.UpdateJobStatus(
-      { job_id, status, error_message: '' },
-      (err) => {
-        if (err) return rej(err);
-        res();
-      }
-    );
-  });
 }
 
 function setStatus(job_id, status, error_message = '') {
@@ -76,10 +58,7 @@ function triggerProcessing(job_id, user_id, content, source_type, source) {
     if (response.stage === 'PROCESS_STAGE_COMPLETE' && response.final_result) {
       const r = response.final_result;
       storageClient.SaveResult({
-        job_id,
-        user_id,
-        source,
-        source_type,
+        job_id, user_id, source, source_type,
         summary:           r.summary,
         key_entities:      r.key_entities,
         qa_pairs:          r.qa_pairs,

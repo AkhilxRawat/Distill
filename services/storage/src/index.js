@@ -9,7 +9,7 @@ const { listResults }     = require('./handlers/listResults');
 const { updateJobStatus } = require('./handlers/updateJobStatus');
 const { getJobStatus }    = require('./handlers/getJobStatus');
 
-const PROTO_PATH = path.join(__dirname, '../../proto/storage.proto');
+const PROTO_PATH = path.join(__dirname, '../proto/storage.proto');
 
 const pkgDef = protoLoader.loadSync(PROTO_PATH, {
   keepCase: true,

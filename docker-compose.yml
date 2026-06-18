@@ -5,34 +5,6 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  storage:
-    build:
-      context: .
-      dockerfile: services/storage/Dockerfile
-    environment:
-      - MONGODB_URI=mongodb://mongodb:27017/distill
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    ports:
-      - "50053:50053"
-
-  processing:
-    build:
-      context: .
-      dockerfile: services/processing/Dockerfile
-    environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-    depends_on:
-      - storage
-    ports:
-      - "50052:50052"
 
   ingestion:
     build:
@@ -44,10 +16,46 @@ services:
       - PROCESSING_HOST=processing
       - PROCESSING_PORT=50052
     depends_on:
+      - mongodb
       - storage
       - processing
+
+  processing:
+    build:
+      context: .
+      dockerfile: services/processing/Dockerfile
+    environment:
+      - STORAGE_HOST=storage
+      - STORAGE_PORT=50053
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      - mongodb
+      - storage
+
+  storage:
+    build:
+      context: .
+      dockerfile: services/storage/Dockerfile
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/distill
+    depends_on:
+      - mongodb
+
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
     ports:
-      - "50051:50051"
+      - "3000:3000"
+    environment:
+      - INGESTION_HOST=ingestion
+      - INGESTION_PORT=50051
+      - STORAGE_HOST=storage
+      - STORAGE_PORT=50053
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - ingestion
+      - storage
 
 volumes:
   mongo_data:

@@ -1,10 +1,11 @@
 syntax = "proto3";
 package distill.storage.v1;
 service StorageService {
-  rpc SaveResult      (SaveResultRequest)     returns (SaveResultResponse);
-  rpc GetResult       (GetResultRequest)      returns (GetResultResponse);
-  rpc ListResults     (ListResultsRequest)    returns (ListResultsResponse);
+  rpc SaveResult      (SaveResultRequest)      returns (SaveResultResponse);
+  rpc GetResult       (GetResultRequest)       returns (GetResultResponse);
+  rpc ListResults     (ListResultsRequest)     returns (ListResultsResponse);
   rpc UpdateJobStatus (UpdateJobStatusRequest) returns (UpdateJobStatusResponse);
+  rpc GetJobStatus    (GetJobStatusRequest)    returns (GetJobStatusResponse);
 }
 message SaveResultRequest {
   string          job_id            = 1;
@@ -21,12 +22,12 @@ message SaveResultRequest {
 message SaveResultResponse  { string result_id = 1; }
 message GetResultRequest    { string result_id = 1; string user_id = 2; }
 message GetResultResponse   { Result result = 1; }
-message ListResultsRequest  { string user_id = 1; int32 page = 2; int32 page_size 
-= 3; }
+message ListResultsRequest  { string user_id = 1; int32 page = 2; int32 page_size = 3; }
 message ListResultsResponse { repeated Result results = 1; int32 total = 2; }
-message UpdateJobStatusRequest  { string job_id = 1; string status = 2; string 
-error_message = 3; }
+message UpdateJobStatusRequest  { string job_id = 1; string status = 2; string error_message = 3; }
 message UpdateJobStatusResponse { bool success = 1; }
+message GetJobStatusRequest  { string job_id = 1; }
+message GetJobStatusResponse { string job_id = 1; string status = 2; string error_message = 3; int64 created_at = 4; int64 updated_at = 5; }
 message Result {
   string          result_id         = 1;
   string          job_id            = 2;
@@ -41,5 +42,4 @@ message Result {
   int32           tokens_used       = 11;
   int64           created_at        = 12;
 }
-
 message QAPair { string question = 1; string answer = 2; }

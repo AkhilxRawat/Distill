@@ -3,7 +3,7 @@ const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
  
 const pkgDef = protoLoader.loadSync(
-  path.join(__dirname, '../../../proto/processing.proto'),
+  path.join(__dirname, '../../proto/processing.proto'),
   { keepCase: true, longs: String, enums: String, defaults: true, oneofs: true }
 );
  

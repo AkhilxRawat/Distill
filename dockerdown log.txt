@@ -1,0 +1,468 @@
+ocker compose down      
+[+] down 6/6
+ ✔ Container distill-gateway-1    Removed                                                                 0.1s
+ ✔ Container distill-ingestion-1  Removed                                                                 0.1s
+ ✔ Container distill-processing-1 Removed                                                                 0.1s
+ ✔ Container distill-storage-1    Removed                                                                 0.1s
+ ✔ Container distill-mongodb-1    Removed                                                                 0.9s
+ ✔ Network distill_default        Removed                                                                 0.3s
+PS C:\Users\user\OneDrive\Desktop\Devops-Argen\Distill> docker compose build     
+#1 [internal] load local bake definitions
+#1 reading from stdin 2.12kB done
+#1 DONE 0.0s
+
+#2 [gateway internal] load build definition from Dockerfile
+#2 transferring dockerfile: 702B 0.0s done
+#2 DONE 0.1s
+
+#3 [storage internal] load build definition from Dockerfile
+#3 transferring dockerfile: 680B 0.0s done
+#3 DONE 0.1s
+
+#4 [storage internal] load metadata for docker.io/library/node:20-alpine
+#4 ...
+
+#5 [processing internal] load build definition from Dockerfile
+#5 transferring dockerfile: 686B 0.0s done
+#5 DONE 0.1s
+
+#6 [ingestion internal] load build definition from Dockerfile
+#6 transferring dockerfile: 710B 0.0s done
+#6 DONE 0.1s
+
+#4 [ingestion internal] load metadata for docker.io/library/node:20-alpine
+#4 ...
+
+#7 [auth] library/node:pull token for registry-1.docker.io
+#7 DONE 0.0s
+
+#4 [ingestion internal] load metadata for docker.io/library/node:20-alpine
+#4 DONE 1.5s
+
+#8 [processing internal] load .dockerignore
+#8 transferring context: 2B done
+#8 DONE 0.0s
+
+#9 [ingestion deps 1/4] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#9 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#9 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.1s done
+#9 DONE 0.1s
+
+#10 [gateway internal] load build context
+#10 transferring context: 89.39kB 0.6s done
+#10 DONE 0.6s
+
+#11 [processing internal] load build context
+#11 transferring context: 2.82kB 0.6s done
+#11 DONE 0.6s
+
+#12 [storage internal] load build context
+#12 transferring context: 3.26kB 0.6s done
+#12 DONE 0.6s
+
+#13 [ingestion internal] load build context
+#13 transferring context: 46.89kB 0.6s done
+#13 DONE 0.6s
+
+#14 [gateway runner 5/6] COPY services/gateway/src ./src
+#14 CACHED
+
+#15 [gateway deps 4/4] RUN npm ci --only=production
+#15 CACHED
+
+#16 [gateway deps 3/4] COPY services/gateway/package*.json ./
+#16 CACHED
+
+#17 [gateway runner 4/6] COPY --from=deps /app/node_modules ./node_modules
+#17 CACHED
+
+#18 [gateway runner 6/6] COPY proto ./proto
+#18 CACHED
+
+#19 [processing runner 4/6] COPY --from=deps /app/node_modules ./node_modules
+#19 CACHED
+
+#20 [processing deps 3/4] COPY services/processing/package*.json ./
+#20 CACHED
+
+#21 [processing deps 4/4] RUN npm ci --only=production
+#21 CACHED
+
+#22 [processing runner 5/6] COPY services/processing/src ./src
+#22 CACHED
+
+#23 [processing runner 6/6] COPY proto ./proto
+#23 CACHED
+
+#24 [ingestion deps 4/4] RUN npm ci --only=production
+#24 CACHED
+
+#25 [ingestion runner 5/6] COPY services/ingestion/src ./src
+#25 CACHED
+
+#26 [ingestion runner 4/6] COPY --from=deps /app/node_modules ./node_modules
+#26 CACHED
+
+#27 [ingestion deps 3/4] COPY services/ingestion/package*.json ./
+#27 CACHED
+
+#28 [storage deps 4/4] RUN npm ci --only=production
+#28 CACHED
+
+#29 [storage runner 3/6] WORKDIR /app
+#29 CACHED
+
+#30 [storage deps 3/4] COPY services/storage/package*.json ./
+#30 CACHED
+
+#31 [storage runner 2/6] RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+#31 CACHED
+
+#32 [storage runner 5/6] COPY services/storage/src ./src
+#32 CACHED
+
+#33 [storage deps 2/4] WORKDIR /app
+#33 CACHED
+
+#34 [storage runner 4/6] COPY --from=deps /app/node_modules ./node_modules
+#34 CACHED
+
+#35 [ingestion runner 6/6] COPY proto ./proto
+#35 CACHED
+
+#36 [storage runner 6/6] COPY proto ./proto
+#36 CACHED
+
+#37 [gateway] exporting to image
+#37 exporting layers 0.0s done
+#37 exporting manifest sha256:4c74618e09b80f3edf07d0065b32a05b20242416f503cbe8293a7fc1ce3dda27 done
+#37 exporting config sha256:75bbdc9807d91e0760a0231fedc83f043db8e9c54fe7e56f1255631d00adc854 0.0s done
+#37 exporting attestation manifest sha256:74d19c341c41deab53c41e5a05d226d9c3ac73a6999668f07b4136c735fabc4e
+#37 exporting attestation manifest sha256:74d19c341c41deab53c41e5a05d226d9c3ac73a6999668f07b4136c735fabc4e 0.2s done
+#37 exporting manifest list sha256:79b31e5b182966da62ed2711a5310467344b0f76c743140b9b085176115f4ebf
+#37 exporting manifest list sha256:79b31e5b182966da62ed2711a5310467344b0f76c743140b9b085176115f4ebf 0.1s done
+#37 naming to docker.io/library/distill-gateway:latest
+#37 naming to docker.io/library/distill-gateway:latest 0.0s done
+#37 unpacking to docker.io/library/distill-gateway:latest 0.1s done
+#37 DONE 0.6s
+
+#38 [processing] exporting to image
+#38 exporting layers 0.0s done
+#38 exporting manifest sha256:161d6c3bd79c291a10e39e97f4245e9ed62d381d47ad9106df81421f9d559144 0.0s done
+#38 exporting config sha256:303a3a11d87c43aeee8eb0b5e3a318f245dd0a22c813f223695e54b5ca64daa5 0.0s done
+#38 exporting attestation manifest sha256:2081feed79acc163c21257abbd73f5c141715a5435bd12388ab6a7b4e2af8fc9 0.2s done
+#38 exporting manifest list sha256:7e33bb8fc97f7435e251d0cadeffc318cd0fa7ffc4441b8dc890fabf9ddc97a8 0.1s done
+#38 naming to docker.io/library/distill-processing:latest 0.0s done
+#38 unpacking to docker.io/library/distill-processing:latest 0.0s done
+#38 DONE 0.6s
+
+#39 [storage] exporting to image
+#39 exporting layers 0.0s done
+#39 exporting manifest sha256:6cb4116c9090f4eabfb15ca2e2220fc90e3f10188677ec364be0654af5502c18 0.0s done
+#39 exporting config sha256:1cad459c297ced488bc8dfa4652cbcda8e6e5c6b45fedf9303d82a382cbec586 0.0s done
+#39 exporting attestation manifest sha256:22801071bead66a35015c535d578c01d8c36705d06ea2107187e52039a702a45 0.2s done
+#39 exporting manifest list sha256:a6e1e26b803bdd9e15c9c82960de1f1102b5114c6f80aeafdccd75dbeccab565 0.1s done
+#39 naming to docker.io/library/distill-storage:latest 0.0s done
+#39 unpacking to docker.io/library/distill-storage:latest 0.0s done
+#39 DONE 0.6s
+
+#40 [ingestion] exporting to image
+#40 exporting layers 0.0s done
+#40 exporting manifest sha256:934394c65a9e61d009b5adf5ed49ed49347995de08f406f6a06697259b984ea4 0.0s done
+#40 exporting config sha256:b7ca10a68d10a3b48d0af2cce203877ac955486992a4115f971a27581c41c243 0.0s done
+#40 exporting attestation manifest sha256:5fd0db6dbd6acf81ea3397456499622b30774d25fd16717c8d94f2bf4ad69f24 0.2s done
+#40 exporting manifest list sha256:01197b1f874d094b301f58adeca2d6d590dc706a9604733895d8c5d80d8a25be 0.1s done
+#40 naming to docker.io/library/distill-ingestion:latest 0.0s done
+#40 unpacking to docker.io/library/distill-ingestion:latest 0.1s done
+#40 DONE 0.6s
+
+#41 [gateway] resolving provenance for metadata file
+#41 DONE 0.3s
+
+#42 [ingestion] resolving provenance for metadata file
+#42 DONE 0.0s
+
+#43 [processing] resolving provenance for metadata file
+#43 DONE 0.2s
+
+#44 [storage] resolving provenance for metadata file
+#44 DONE 0.1s
+[+] build 4/4
+ ✔ Image distill-storage    Built                                                                         5.3s
+ ✔ Image distill-gateway    Built                                                                         5.3s
+ ✔ Image distill-ingestion  Built                                                                         5.3s
+ ✔ Image distill-processing Built                                                                         5.3s
+PS C:\Users\user\OneDrive\Desktop\Devops-Argen\Distill> docker compose up
+[+] up 6/6
+ ✔ Network distill_default        Created                                                                 0.1s
+ ✔ Container distill-mongodb-1    Created                                                                 0.3s
+ ✔ Container distill-storage-1    Created                                                                 0.2s
+ ✔ Container distill-processing-1 Created                                                                 0.3s
+ ✔ Container distill-ingestion-1  Created                                                                 0.3s
+ ✔ Container distill-gateway-1    Created                                                                 0.2s
+Attaching to gateway-1, ingestion-1, mongodb-1, processing-1, storage-1
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.085+00:00"},"s":"I",  "c":"CONTROL",  "id":23285,   "ctx":"main","msg":"Automatically disabling TLS 1.0, to force-enable TLS 1.0 specify --sslDisabledProtocols 'none'"}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.098+00:00"},"s":"I",  "c":"NETWORK",  "id":4915701, "ctx":"main","msg":"Initialized wire specification","attr":{"spec":{"incomingExternalClient":{"minWireVersion":0,"maxWireVersion":21},"incomingInternalClient":{"minWireVersion":0,"maxWireVersion":21},"outgoing":{"minWireVersion":6,"maxWireVersion":21},"isInternalClient":true}}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.099+00:00"},"s":"I",  "c":"NETWORK",  "id":4648601, "ctx":"main","msg":"Implicit TCP FastOpen unavailable. If TCP FastOpen is required, set tcpFastOpenServer, tcpFastOpenClient, and tcpFastOpenQueueSize."}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.111+00:00"},"s":"I",  "c":"REPL",     "id":5123008, "ctx":"main","msg":"Successfully registered PrimaryOnlyService","attr":{"service":"TenantMigrationDonorService","namespace":"config.tenantMigrationDonors"}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.111+00:00"},"s":"I",  "c":"REPL",     "id":5123008, "ctx":"main","msg":"Successfully registered PrimaryOnlyService","attr":{"service":"TenantMigrationRecipientService","namespace":"config.tenantMigrationRecipients"}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.111+00:00"},"s":"W",  "c":"NETWORK",  "id":11621101,"ctx":"main","msg":"Overriding max connections to honor `capMemoryConsumptionForPreAuthBuffers` settings","attr":{"limit":97856}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.111+00:00"},"s":"I",  "c":"CONTROL",  "id":5945603, "ctx":"main","msg":"Multi threading initialized"}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.112+00:00"},"s":"I",  "c":"TENANT_M", "id":7091600, "ctx":"main","msg":"Starting TenantMigrationAccessBlockerRegistry"}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.114+00:00"},"s":"I",  "c":"CONTROL",  "id":4615611, "ctx":"initandlisten","msg":"MongoDB starting","attr":{"pid":1,"port":27017,"dbPath":"/data/db","architecture":"64-bit","host":"cdd9230224f2"}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.115+00:00"},"s":"I",  "c":"CONTROL",  "id":23403,   "ctx":"initandlisten","msg":"Build Info","attr":{"buildInfo":{"version":"7.0.37","gitVersion":"9d30419d900008ba3ecf2a14546b236f2158b65b","openSSLVersion":"OpenSSL 3.0.2 15 Mar 2022","modules":[],"allocator":"tcmalloc","environment":{"distmod":"ubuntu2204","distarch":"x86_64","target_arch":"x86_64"}}}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.115+00:00"},"s":"I",  "c":"CONTROL",  "id":51765,   "ctx":"initandlisten","msg":"Operating System","attr":{"os":{"name":"Ubuntu","version":"22.04"}}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.115+00:00"},"s":"I",  "c":"CONTROL",  "id":21951,   "ctx":"initandlisten","msg":"Options set by command line","attr":{"options":{"net":{"bindIp":"*"}}}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.115+00:00"},"s":"W",  "c":"NETWORK",  "id":11621101,"ctx":"initandlisten","msg":"Overriding max connections to honor `capMemoryConsumptionForPreAuthBuffers` settings","attr":{"limit":97856}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.123+00:00"},"s":"I",  "c":"STORAGE",  "id":22270,   "ctx":"initandlisten","msg":"Storage engine to use detected by data files","attr":{"dbpath":"/data/db","storageEngine":"wiredTiger"}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.126+00:00"},"s":"I",  "c":"STORAGE",  "id":22297,   "ctx":"initandlisten","msg":"Using the XFS filesystem is strongly recommended with the WiredTiger storage engine. See http://dochub.mongodb.org/core/prodnotes-filesystem","tags":["startupWarnings"]}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.127+00:00"},"s":"I",  "c":"STORAGE",  "id":22315,   "ctx":"initandlisten","msg":"Opening WiredTiger","attr":{"config":"create,cache_size=3310M,session_max=33000,eviction=(threads_min=4,threads_max=4),config_base=false,statistics=(fast),log=(enabled=true,remove=true,path=journal,compressor=snappy),builtin_extension_config=(zstd=(compression_level=6)),file_manager=(close_idle_time=600,close_scan_interval=10,close_handle_minimum=2000),statistics_log=(wait=0),json_output=(error,message),verbose=[recovery_progress:1,checkpoint_progress:1,compact_progress:1,backup:0,checkpoint:0,compact:0,evict:0,history_store:0,recovery:0,rts:0,salvage:0,tiered:0,timestamp:0,transaction:0,verify:0,log:0],"}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:54.941+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767014,"ts_usec":941129,"thread":"1:0x710df61c9cc0","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"Recovering log 2 through 3"}}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:55.758+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767015,"ts_usec":758123,"thread":"1:0x710df61c9cc0","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"Recovering log 3 through 3"}}}
+mongodb-1  | {"t":{"$date":"2026-06-18T07:16:56.168+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767016,"ts_usec":168627,"thread":"1:0x710df61c9cc0","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"Main recovery loop: starting at 2/11520 to 3/256"}}}
+processing-1  | node:internal/modules/cjs/loader:1210
+processing-1  |   throw err;
+processing-1  |   ^
+processing-1  | 
+processing-1  | Error: Cannot find module '../gemini/prompts'
+processing-1  | Require stack:
+
+
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:56.643+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767016,"ts_usec":642996,"thread":"1:0x710df61c9cc0","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"Recovering log 2 through 3"}}}
+processing-1  | - /app/src/handlers/processContent.js
+
+
+
+
+processing-1  | - /app/src/index.js
+processing-1  |     at Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)
+processing-1  |     at Module._load (node:internal/modules/cjs/loader:1038:27)
+processing-1  |     at Module.require (node:internal/modules/cjs/loader:1289:19)
+processing-1  |     at require (node:internal/modules/helpers:182:18)
+processing-1  |     at Object.<anonymous> (/app/src/handlers/processContent.js:2:25)
+processing-1  |     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+processing-1  |     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:56.882+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767016,"ts_usec":882307,"thread":"1:0x710df61c9cc0","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"Recovering log 3 through 3"}}}
+processing-1 exited with code 1
+
+
+
+
+processing-1  |     at Module._load (node:internal/modules/cjs/loader:1091:12)tach
+processing-1  |     at Module.require (node:internal/modules/cjs/loader:1289:19) {
+processing-1  |   code: 'MODULE_NOT_FOUND',
+processing-1  |   requireStack: [ '/app/src/handlers/processContent.js', '/app/src/index.js' ]
+processing-1  | }
+processing-1  | 
+processing-1  | Node.js v20.20.2
+
+
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.117+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767017,"ts_usec":117542,"thread":"1:0x710df61c9cc0","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"recovery log replay has successfully finished and ran for 2178 mi
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.117+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767017,"ts_usec":117864,"thread":"1:0x710df61c9cc0","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"Set global recovery timestamp: (0, 0)"}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.117+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767017,"ts_usec":117940,"thread":"1:0x710df61c9cc0","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"Set global oldest timestamp: (0, 0)"}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.120+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767017,"ts_usec":120723,"thread":"1:0x710df61c9cc0","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"recovery rollback to stable has successfully finished and ran for 2 milliseconds"}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.130+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767017,"ts_usec":130134,"thread":"1:0x710df61c9cc0","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 1, snapshot max: 1 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 63"}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.171+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767017,"ts_usec":171722,"thread":"1:0x710df61c9cc0","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"recovery checkpoint has successfully finished and ran for 49 milliseconds"}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.172+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767017,"ts_usec":172152,"thread":"1:0x710df61c9cc0","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"recovery was completed successfully and took 2233ms, including 2178ms for the log replay, 2ms for the rollback to stable, and 49ms for the checkpoint."}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.183+00:00"},"s":"I",  "c":"STORAGE",  "id":4795906, "ctx":"initandlisten","msg":"WiredTiger opened","attr":{"durationMillis":3056}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.184+00:00"},"s":"I",  "c":"RECOVERY", "id":23987,   "ctx":"initandlisten","msg":"WiredTiger recoveryTimestamp","attr":{"recoveryTimestamp":{"$timestamp":{"t":0,"i":0}}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.221+00:00"},"s":"W",  "c":"CONTROL",  "id":22120,   "ctx":"initandlisten","msg":"Access control is not enabled for the database. Read and write access to data and configuration is unrestricted","tags":["startupWarnings"]}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.238+00:00"},"s":"I",  "c":"NETWORK",  "id":4915702, "ctx":"initandlisten","msg":"Updated wire specification","attr":{"oldSpec":{"incomingExternalClient":{"minWireVersion":0,"maxWireVersion":21},"incomingInternalClient":{"minWireVersion":0,"maxWireVersion":21},"outgoing":{"minWireVersion":6,"maxWireVersion":21},"isInternalClient":true},"newSpec":{"incomingExternalClient":{"minWireVersion":0,"maxWireVersion":21},"incomingInternalClient":{"minWireVersion":21,"maxWireVersion":21},"outgoing":{"minWireVersion":21,"maxWireVersion":21},"isInternalClient":true}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.238+00:00"},"s":"I",  "c":"REPL",     "id":5853300, "ctx":"initandlisten","msg":"current featureCompatibilityVersion value","attr":{"featureCompatibilityVersion":"7.0","context":"startup"}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.239+00:00"},"s":"I",  "c":"STORAGE",  "id":5071100, "ctx":"initandlisten","msg":"Clearing temp directory"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.245+00:00"},"s":"I",  "c":"CONTROL",  "id":6608200, "ctx":"initandlisten","msg":"Initializing cluster server parameters from disk"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.250+00:00"},"s":"I",  "c":"CONTROL",  "id":20536,   "ctx":"initandlisten","msg":"Flow Control is enabled on this deployment"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.257+00:00"},"s":"I",  "c":"FTDC",     "id":20625,   "ctx":"initandlisten","msg":"Initializing full-time diagnostic data capture","attr":{"dataDirectory":"/data/db/diagnostic.data"}}
+
+
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.282+00:00"},"s":"I",  "c":"REPL",     "id":6015317, "ctx":"initandlisten","msg":"Setting new configuration state","attr":{"newState":"ConfigReplicationDisabled","oldState":"ConfigPreStart"}}
+gateway-1     | node:internal/modules/cjs/loader:1210
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.284+00:00"},"s":"I",  "c":"STORAGE",  "id":22262,   "ctx":"initandlisten","msg":"Timestamp monitor starting"}
+gateway-1     |   throw err;
+
+
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.304+00:00"},"s":"I",  "c":"NETWORK",  "id":23015,   "ctx":"listener","msg":"Listening on","attr":{"address":"/tmp/mongodb-27017.sock"}}
+gateway-1     |   ^
+
+
+ingestion-1   |             throw err;
+
+gateway-1     | 
+
+
+
+
+ingestion-1   |             ^
+gateway-1     | Error: Cannot find module '/app/src/index.js'},"s":"I",  "c":"NETWORK",  "id":23015,   "ctx":"
+
+ingestion-1   | 
+
+gateway-1     |     at Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.304+00:00"},"s":"I",  "c":"NETWORK",  "id":23016,   "ctx":"listener","msg":"Waiting for connections","attr":{"port":27017,"ssl":"off"}}
+storage-1     | /app/node_modules/protobufjs/src/root.js:120
+
+
+ingestion-1   | Error: ENOENT: no such file or directory, open '/proto/storage.proto'
+
+
+
+storage-1     |             throw err;
+gateway-1     |     at Module._load (node:internal/modules/cjs/loader:1038:27)
+mongodb-1     | {"t":{"$date":"2026-06-18T07:16:57.304+00:00"},"s":"I",  "c":"CONTROL",  "id":8423403, "ctx":"initandlisten","msg":"mongod startup complete","attr":{"Summary of time elapsed":{"Startup from clean shutdown?":true,"Statistics":{"Transport layer setup":"0 ms","Run initial syncer crash recovery":"0 ms","Create storage engine lock file in the data directory":"0 ms","Get metadata describing storage engine":"1 ms","Validate options in metadata against current startup options":"0 ms","Create storage engine":"3071 ms","Write current PID to file":"23 ms","Initialize FCV before rebuilding indexes":"16 ms","Drop abandoned idents and get back indexes that need to be rebuilt or builds that need to be restarted":"0 ms","Rebuild indexes for collections":"0 ms","Load cluster parameters from disk for a standalone":"2 ms","Build user and roles graph":"0 ms","Set up the background thread pool responsible for waiting for opTimes to be majority committed":"2 ms","Initialize information needed to make a mongod instance shard aware":"2 ms","Start up the replication coordinator":"2 ms","Start transport layer":"1 ms","_initAndListen total elapsed time":"3190 ms"}}}}
+
+
+storage-1     |             ^
+
+
+
+
+
+ingestion-1   |     at Object.readFileSync (node:fs:452:35)
+storage-1     | 
+
+gateway-1     |     at node:internal/main/run_main_module:28:49 {
+
+
+ingestion-1   |     at fetch (/app/node_modules/protobufjs/src/root.js:203:34)
+
+gateway-1     |   code: 'MODULE_NOT_FOUND',
+
+
+ingestion-1   |     at Root.load (/app/node_modules/protobufjs/src/root.js:239:13)
+
+
+ingestion-1   |     at Root.loadSync (/app/node_modules/protobufjs/src/root.js:283:17)
+storage-1     | Error: ENOENT: no such file or directory, open '/proto/storage.proto'
+gateway-1     |   requireStack: []
+storage-1     |     at Object.openSync (node:fs:573:18)node_modules/@grpc/proto-loader/build/src/util.js:67:29
+gateway-1     | }
+v View in Docker Desktop   o View Config   l View Logs   w Enable Watch   d Detach
+
+gateway-1     | 
+storage-1     |     at Object.readFileSync (node:fs:452:35)
+ingestion-1   |     at Object.loadSync (/app/node_modules/@grpc/proto-loader/build/src/index.js:224:61)
+
+
+gateway-1     | Node.js v20.20.2
+
+storage-1     |     at fetch (/app/node_modules/protobufjs/src/root.js:203:34)
+ingestion-1   |     at Object.<anonymous> (/app/src/grpc/storageClient.js:6:28)
+
+
+gateway-1 exited with code 1
+
+
+ingestion-1   |     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+
+
+ingestion-1   |     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10) {
+ingestion-1   |   errno: -2,
+
+storage-1     |     at loadProtosWithOptionsSync (/app/node_modules/@grpc/proto-loader/build/src/util.js:67:29)
+
+
+
+ingestion-1   |   code: 'ENOENT',
+
+storage-1     |     at Object.loadSync (/app/node_modules/@grpc/proto-loader/build/src/index.js:224:61)
+storage-1 exited with code 1
+
+
+ingestion-1   |   syscall: 'open',
+storage-1     |     at Object.<anonymous> (/app/src/index.js:14:28)
+
+ingestion-1   |   path: '/proto/storage.proto'
+
+
+storage-1     |     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+ingestion-1   | }
+storage-1     |     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10) {
+ingestion-1   | 
+storage-1     |   errno: -2,
+
+ingestion-1   | Node.js v20.20.2
+
+
+v View in Docker Desktop   o View Config   l View Logs   w Enable Watch   d Detach
+
+storage-1     |   code: 'ENOENT',
+storage-1     |   syscall: 'open',
+storage-1     |   path: '/proto/storage.proto'
+storage-1     | }
+storage-1     | 
+storage-1     | Node.js v20.20.2
+mongodb-1     | {"t":{"$date":"2026-06-18T07:17:57.219+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767077,"ts_usec":219639,"thread":"1:0x710ded1b6640","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 4, snapshot max: 4 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 63"}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:18:57.244+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767137,"ts_usec":244785,"thread":"1:0x710ded1b6640","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 5, snapshot max: 5 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 63"}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:19:57.260+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767197,"ts_usec":260647,"thread":"1:0x710ded1b6640","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 6, snapshot max: 6 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 63"}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:20:57.270+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767257,"ts_usec":269996,"thread":"1:0x710ded1b6640","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 7, snapshot max: 7 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 63"}}}
+storage-1 exited with code 1
+processing-1 exited with code 1
+ingestion-1 exited with code 1
+gateway-1 exited with code 1
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.416+00:00"},"s":"I",  "c":"CONTROL",  "id":23377,   "ctx":"SignalHandler","msg":"Received signal","attr":{"signal":15,"error":"Terminated"}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.416+00:00"},"s":"I",  "c":"CONTROL",  "id":23378,   "ctx":"SignalHandler","msg":"Signal was sent by kill(2)","attr":{"pid":0,"uid":0}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.416+00:00"},"s":"I",  "c":"CONTROL",  "id":23381,   "ctx":"SignalHandler","msg":"will terminate after current cmd ends"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.416+00:00"},"s":"I",  "c":"REPL",     "id":4784900, "ctx":"SignalHandler","msg":"Stepping down the ReplicationCoordinator for shutdown","attr":{"waitTimeMillis":15000}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.417+00:00"},"s":"I",  "c":"REPL",     "id":4794602, "ctx":"SignalHandler","msg":"Attempting to enter quiesce mode"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.417+00:00"},"s":"I",  "c":"-",        "id":6371601, "ctx":"SignalHandler","msg":"Shutting down the FLE Crud thread pool"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.417+00:00"},"s":"I",  "c":"COMMAND",  "id":4784901, "ctx":"SignalHandler","msg":"Shutting down the MirrorMaestro"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.417+00:00"},"s":"I",  "c":"SHARDING", "id":4784902, "ctx":"SignalHandler","msg":"Shutting down the WaitForMajorityService"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.421+00:00"},"s":"I",  "c":"CONTROL",  "id":4784903, "ctx":"SignalHandler","msg":"Shutting down the LogicalSessionCache"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.423+00:00"},"s":"I",  "c":"NETWORK",  "id":20562,   "ctx":"SignalHandler","msg":"Shutdown: going to close listening sockets"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.423+00:00"},"s":"I",  "c":"NETWORK",  "id":23017,   "ctx":"listener","msg":"removing socket file","attr":{"path":"/tmp/mongodb-27017.sock"}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.424+00:00"},"s":"I",  "c":"NETWORK",  "id":4784905, "ctx":"SignalHandler","msg":"Shutting down the global connection pool"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.424+00:00"},"s":"I",  "c":"CONTROL",  "id":4784906, "ctx":"SignalHandler","msg":"Shutting down the FlowControlTicketholder"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.424+00:00"},"s":"I",  "c":"-",        "id":20520,   "ctx":"SignalHandler","msg":"Stopping further Flow Control ticket acquisitions."}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.424+00:00"},"s":"I",  "c":"CONTROL",  "id":4784908, "ctx":"SignalHandler","msg":"Shutting down the PeriodicThreadToAbortExpiredTransactions"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.425+00:00"},"s":"I",  "c":"REPL",     "id":4784909, "ctx":"SignalHandler","msg":"Shutting down the ReplicationCoordinator"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.425+00:00"},"s":"I",  "c":"SHARDING", "id":4784910, "ctx":"SignalHandler","msg":"Shutting down the ShardingInitializationMongoD"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.425+00:00"},"s":"I",  "c":"REPL",     "id":4784911, "ctx":"SignalHandler","msg":"Enqueuing the ReplicationStateTransitionLock for shutdown"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.425+00:00"},"s":"I",  "c":"-",        "id":4784912, "ctx":"SignalHandler","msg":"Killing all operations for shutdown"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.426+00:00"},"s":"I",  "c":"-",        "id":4695300, "ctx":"SignalHandler","msg":"Interrupted all currently running operations","attr":{"opsKilled":3}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.426+00:00"},"s":"I",  "c":"TENANT_M", "id":5093807, "ctx":"SignalHandler","msg":"Shutting down all TenantMigrationAccessBlockers on global shutdown"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.426+00:00"},"s":"I",  "c":"ASIO",     "id":22582,   "ctx":"TenantMigrationBlockerNet","msg":"Killing all outstanding egress activity."}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.427+00:00"},"s":"I",  "c":"ASIO",     "id":6529201, "ctx":"SignalHandler","msg":"Network interface redundant shutdown","attr":{"state":"Stopped"}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.427+00:00"},"s":"I",  "c":"ASIO",     "id":22582,   "ctx":"SignalHandler","msg":"Killing all outstanding egress activity."}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.428+00:00"},"s":"I",  "c":"COMMAND",  "id":4784913, "ctx":"SignalHandler","msg":"Shutting down all open transactions"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.428+00:00"},"s":"I",  "c":"REPL",     "id":4784914, "ctx":"SignalHandler","msg":"Acquiring the ReplicationStateTransitionLock for shutdown"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.428+00:00"},"s":"I",  "c":"INDEX",    "id":4784915, "ctx":"SignalHandler","msg":"Shutting down the IndexBuildsCoordinator"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.428+00:00"},"s":"I",  "c":"NETWORK",  "id":4784918, "ctx":"SignalHandler","msg":"Shutting down the ReplicaSetMonitor"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.428+00:00"},"s":"I",  "c":"SHARDING", "id":4784921, "ctx":"SignalHandler","msg":"Shutting down the MigrationUtilExecutor"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.429+00:00"},"s":"I",  "c":"ASIO",     "id":22582,   "ctx":"MigrationUtil-TaskExecutor","msg":"Killing all outstanding egress activity."}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.430+00:00"},"s":"I",  "c":"COMMAND",  "id":4784923, "ctx":"SignalHandler","msg":"Shutting down the ServiceEntryPoint"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.430+00:00"},"s":"I",  "c":"CONTROL",  "id":4784927, "ctx":"SignalHandler","msg":"Shutting down the HealthLog"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.430+00:00"},"s":"I",  "c":"CONTROL",  "id":4784928, "ctx":"SignalHandler","msg":"Shutting down the TTL monitor"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.430+00:00"},"s":"I",  "c":"INDEX",    "id":3684100, "ctx":"SignalHandler","msg":"Shutting down TTL collection monitor thread"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.430+00:00"},"s":"I",  "c":"ASIO",     "id":22582,   "ctx":"TTLMonitorMetadataRefreshNetwork","msg":"Killing all outstanding egress activity."}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.431+00:00"},"s":"I",  "c":"INDEX",    "id":3684101, "ctx":"SignalHandler","msg":"Finished shutting down TTL collection monitor thread"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.431+00:00"},"s":"I",  "c":"CONTROL",  "id":6278511, "ctx":"SignalHandler","msg":"Shutting down the Change Stream Expired Pre-images Remover"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.431+00:00"},"s":"I",  "c":"CONTROL",  "id":4784929, "ctx":"SignalHandler","msg":"Acquiring the global lock for shutdown"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.431+00:00"},"s":"I",  "c":"CONTROL",  "id":4784930, "ctx":"SignalHandler","msg":"Shutting down the storage engine"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.431+00:00"},"s":"I",  "c":"STORAGE",  "id":22320,   "ctx":"SignalHandler","msg":"Shutting down journal flusher thread"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.432+00:00"},"s":"I",  "c":"STORAGE",  "id":22321,   "ctx":"SignalHandler","msg":"Finished shutting down journal flusher thread"}
+mongodb-1 exited with code 0
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.432+00:00"},"s":"I",  "c":"STORAGE",  "id":22322,   "ctx":"SignalHandler","msg":"Shutting down checkpoint thread"}
+
+
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.433+00:00"},"s":"I",  "c":"STORAGE",  "id":22323,   "ctx":"SignalHandler","msg":"Finished shutting down checkpoint thread"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.433+00:00"},"s":"I",  "c":"STORAGE",  "id":22261,   "ctx":"SignalHandler","msg":"Timestamp monitor shutting down"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.434+00:00"},"s":"I",  "c":"STORAGE",  "id":20282,   "ctx":"SignalHandler","msg":"Deregistering all the collections"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.436+00:00"},"s":"I",  "c":"STORAGE",  "id":22317,   "ctx":"SignalHandler","msg":"WiredTigerKVEngine shutting down"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.436+00:00"},"s":"I",  "c":"STORAGE",  "id":22318,   "ctx":"SignalHandler","msg":"Shutting down session sweeper thread"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.437+00:00"},"s":"I",  "c":"STORAGE",  "id":22319,   "ctx":"SignalHandler","msg":"Finished shutting down session sweeper thread"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.437+00:00"},"s":"I",  "c":"STORAGE",  "id":4795902, "ctx":"SignalHandler","msg":"Closing WiredTiger","attr":{"closeConfig":"leak_memory=true,use_timestamp=false,"}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.441+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"SignalHandler","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767283,"ts_usec":441438,"thread":"1:0x710df61c8640","session_name":"close_ckpt","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 8, snapshot max: 8 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 63"}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.467+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"SignalHandler","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767283,"ts_usec":467577,"thread":"1:0x710df61c8640","session_name":"WT_CONNECTION.close","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"shutdown checkpoint has successfully finished and ran for 26 milliseconds"}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.469+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"SignalHandler","msg":"WiredTiger message","attr":{"message":{"ts_sec":1781767283,"ts_usec":468976,"thread":"1:0x710df61c8640","session_name":"WT_CONNECTION.close","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"shutdown was completed successfully and took 31ms, including 0ms for the rollback to stable, and 26ms for the checkpoint."}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.501+00:00"},"s":"I",  "c":"STORAGE",  "id":4795901, "ctx":"SignalHandler","msg":"WiredTiger closed","attr":{"durationMillis":64}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.501+00:00"},"s":"I",  "c":"STORAGE",  "id":22279,   "ctx":"SignalHandler","msg":"shutdown: removing fs lock..."}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.502+00:00"},"s":"I",  "c":"-",        "id":4784931, "ctx":"SignalHandler","msg":"Dropping the scope cache for shutdown"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.502+00:00"},"s":"I",  "c":"FTDC",     "id":20626,   "ctx":"SignalHandler","msg":"Shutting down full-time diagnostic data capture"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.519+00:00"},"s":"I",  "c":"-",        "id":10175800,"ctx":"SignalHandler","msg":"Shutting down the standalone executor"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.521+00:00"},"s":"I",  "c":"ASIO",     "id":22582,   "ctx":"StandaloneNetwork","msg":"Killing all outstanding egress activity."}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.521+00:00"},"s":"I",  "c":"CONTROL",  "id":20565,   "ctx":"SignalHandler","msg":"Now exiting"}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.523+00:00"},"s":"I",  "c":"CONTROL",  "id":8423404, "ctx":"SignalHandler","msg":"mongod shutdown complete","attr":{"Summary of time elapsed":{"Statistics":{"Enter terminal shutdown":"0 ms","Step down the replication coordinator for shutdown":"1 ms","Time spent in quiesce mode":"0 ms","Shut down FLE Crud subsystem":"0 ms","Shut down MirrorMaestro":"0 ms","Shut down WaitForMajorityService":"3 ms","Shut down the logical session cache":"1 ms","Shut down the transport layer":"2 ms","Shut down the global connection pool":"1 ms","Shut down the flow control ticket holder":"0 ms","Kill all operations for shutdown":"1 ms","Shut down all tenant migration access blockers on global shutdown":"1 ms","Shut down all open transactions":"1 ms","Acquire the RSTL for shutdown":"0 ms","Shut down the IndexBuildsCoordinator and wait for index builds to finish":"0 ms","Shut down the replica set monitor":"0 ms","Shut down the migration util executor":"1 ms","Shut down the health log":"0 ms","Shut down the TTL monitor":"1 ms","Shut down expired pre-images and documents removers":"0 ms","Shut down the storage engine":"71 ms","Wait for the oplog cap maintainer thread to stop":"0 ms","Shut down full-time data capture":"10 ms","Shut down standalone executor":"9 ms","shutdownTask total elapsed time":"106 ms"}}}}
+mongodb-1     | {"t":{"$date":"2026-06-18T07:21:23.525+00:00"},"s":"I",  "c":"CONTROL",  "id":23138,   "ctx":"SignalHandler","msg":"Shutting down","attr":{"exitCode":0}}
+PS C:\Users\user\OneDrive\Desktop\Devops-Argen\Distill> 
+
+v View in Docker Desktop   o View Config   l View Logs   w Enable Watch   d Detach

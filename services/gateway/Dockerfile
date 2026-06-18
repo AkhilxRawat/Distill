@@ -1,10 +1,7 @@
-# Stage 1 — install production dependencies only
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY services/gateway/package*.json ./
 RUN npm ci --only=production
-
-# Stage 2 — lean final image
 FROM node:20-alpine AS runner
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app

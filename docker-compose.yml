@@ -1,0 +1,53 @@
+services:
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  storage:
+    build:
+      context: .
+      dockerfile: services/storage/Dockerfile
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/distill
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    ports:
+      - "50053:50053"
+
+  processing:
+    build:
+      context: .
+      dockerfile: services/processing/Dockerfile
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      - storage
+    ports:
+      - "50052:50052"
+
+  ingestion:
+    build:
+      context: .
+      dockerfile: services/ingestion/Dockerfile
+    environment:
+      - STORAGE_HOST=storage
+      - STORAGE_PORT=50053
+      - PROCESSING_HOST=processing
+      - PROCESSING_PORT=50052
+    depends_on:
+      - storage
+      - processing
+    ports:
+      - "50051:50051"
+
+volumes:
+  mongo_data:

@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 
-=======
->>>>>>> 9b99508a78171b281cea138f0c4d411772ee1c04
 FROM node:20-alpine AS deps
 
 WORKDIR /app
@@ -32,7 +29,4 @@ HEALTHCHECK --interval=30s --timeout=5s \
   CMD node -e "require('net').createConnection(50051,'localhost').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
 
 CMD ["node", "src/index.js"]
-<<<<<<< HEAD
 
-=======
->>>>>>> 9b99508a78171b281cea138f0c4d411772ee1c04

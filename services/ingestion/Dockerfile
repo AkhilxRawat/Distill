@@ -1,4 +1,4 @@
-# Stage 1 — install production dependencies only
+
 FROM node:20-alpine AS deps
 
 WORKDIR /app
@@ -19,7 +19,7 @@ COPY --from=deps /app/node_modules ./node_modules
 
 COPY services/ingestion/src ./src
 
-COPY proto ./proto
+COPY proto /app/proto         
 
 USER appuser
 
@@ -29,3 +29,4 @@ HEALTHCHECK --interval=30s --timeout=5s \
   CMD node -e "require('net').createConnection(50051,'localhost').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
 
 CMD ["node", "src/index.js"]
+

@@ -1,4 +1,5 @@
-# Stage 1 — install production dependencies only
+
+
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY services/storage/package*.json ./
@@ -10,7 +11,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY services/storage/src ./src
-COPY proto ./proto
+COPY proto /app/proto         
 USER appuser
 EXPOSE 50053
 HEALTHCHECK --interval=30s --timeout=5s \

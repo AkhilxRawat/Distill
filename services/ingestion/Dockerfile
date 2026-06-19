@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9b99508a78171b281cea138f0c4d411772ee1c04
 FROM node:20-alpine AS deps
 
 WORKDIR /app
@@ -8,7 +11,7 @@ COPY services/ingestion/package*.json ./
 RUN npm ci --only=production
 
 
-# Stage 2 — lean final image
+
 FROM node:20-alpine AS runner
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
@@ -29,4 +32,7 @@ HEALTHCHECK --interval=30s --timeout=5s \
   CMD node -e "require('net').createConnection(50051,'localhost').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
 
 CMD ["node", "src/index.js"]
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9b99508a78171b281cea138f0c4d411772ee1c04

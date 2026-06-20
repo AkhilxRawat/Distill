@@ -56,6 +56,17 @@ services:
     depends_on:
       - ingestion
       - storage
-
+  
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+    depends_on:
+      - gateway
+  
 volumes:
   mongo_data:

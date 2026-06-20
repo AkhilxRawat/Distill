@@ -1,115 +1,72 @@
-const express    = require('express');
-const cors       = require('cors');
-const path       = require('path');
-const grpc       = require('@grpc/grpc-js');
-const protoLoader = require('@grpc/proto-loader');
-const jwt        = require('jsonwebtoken');
+'use strict';
 
+const http    = require('http');
+const express = require('express');
+const cors    = require('cors');
+
+const { apiLimiter }           = require('./middleware/rateLimiter');
+const { errorHandler }         = require('./middleware/errors');
+const { attachWebSocketServer } = require('./ws/jobStream');
+
+const authRoutes    = require('./routes/auth');
+const jobRoutes     = require('./routes/jobs');
+const resultRoutes  = require('./routes/results');
+
+// ── App setup ─────────────────────────────────────────────────────────────────
 const app = express();
-app.use(cors());
-app.use(express.json());
 
-const JWT_SECRET = process.env.JWT_SECRET || 'distill-secret-change-me';
+app.set('trust proxy', 1); // trust X-Forwarded-For from load balancers
 
-// ── Load protos ──────────────────────────────────────────────────────────────
-function loadProto(file) {
-  return protoLoader.loadSync(path.join(__dirname, '../proto', file), {
-    keepCase: true, longs: String, enums: String, defaults: true, oneofs: true,
+app.use(cors({
+  origin:  process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+app.use(express.json({ limit: '512kb' }));
+
+// Global API rate limiter (auth routes have their own stricter limiter)
+app.use('/api', apiLimiter);
+
+// ── Health check ──────────────────────────────────────────────────────────────
+app.get('/health', (_req, res) => res.json({ status: 'ok', ts: Date.now() }));
+
+// ── Routes ────────────────────────────────────────────────────────────────────
+app.use('/auth',         authRoutes);
+app.use('/jobs',         jobRoutes);
+app.use('/results',      resultRoutes);
+
+// Backward-compat aliases with /api prefix
+app.use('/api/auth',     authRoutes);
+app.use('/api/jobs',     jobRoutes);
+app.use('/api/results',  resultRoutes);
+
+// ── 404 handler ───────────────────────────────────────────────────────────────
+app.use((_req, res) => res.status(404).json({ error: 'Not Found' }));
+
+// ── Centralised error handler ─────────────────────────────────────────────────
+app.use(errorHandler);
+
+// ── HTTP + WebSocket server ───────────────────────────────────────────────────
+const PORT   = parseInt(process.env.PORT || '3000', 10);
+const server = http.createServer(app);
+
+attachWebSocketServer(server);
+
+server.listen(PORT, () => {
+  console.log(`[gateway] HTTP  listening on :${PORT}`);
+  console.log(`[gateway] WS    listening on ws://localhost:${PORT}/ws/jobs`);
+});
+
+// ── Graceful shutdown ─────────────────────────────────────────────────────────
+function shutdown(signal) {
+  console.log(`[gateway] received ${signal}, shutting down…`);
+  server.close(() => {
+    console.log('[gateway] HTTP server closed');
+    process.exit(0);
   });
+  setTimeout(() => process.exit(1), 10_000); // force-exit after 10 s
 }
 
-const ingestionProto = grpc.loadPackageDefinition(loadProto('ingestion.proto')).distill.ingestion.v1;
-const storageProto   = grpc.loadPackageDefinition(loadProto('storage.proto')).distill.storage.v1;
-
-const ingestionHost = `${process.env.INGESTION_HOST || 'localhost'}:${process.env.INGESTION_PORT || 50051}`;
-const storageHost   = `${process.env.STORAGE_HOST   || 'localhost'}:${process.env.STORAGE_PORT   || 50053}`;
-
-const ingestionClient = new ingestionProto.IngestionService(ingestionHost, grpc.credentials.createInsecure());
-const storageClient   = new storageProto.StorageService(storageHost, grpc.credentials.createInsecure());
-
-// ── Auth middleware ──────────────────────────────────────────────────────────
-function authenticate(req, res, next) {
-  const auth = req.headers.authorization;
-  if (!auth || !auth.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Missing or invalid Authorization header' });
-  }
-  try {
-    req.user = jwt.verify(auth.slice(7), JWT_SECRET);
-    next();
-  } catch {
-    res.status(401).json({ error: 'Invalid or expired token' });
-  }
-}
-
-// ── Health ───────────────────────────────────────────────────────────────────
-app.get('/health', (_req, res) => res.json({ status: 'ok' }));
-
-// ── Auth routes ──────────────────────────────────────────────────────────────
-// Simple token issue — in production wire this to a real user store
-app.post('/auth/token', (req, res) => {
-  const { user_id, email } = req.body;
-  if (!user_id) return res.status(400).json({ error: 'user_id required' });
-  const token = jwt.sign({ user_id, email }, JWT_SECRET, { expiresIn: '7d' });
-  res.json({ token });
-});
-
-// ── Job routes ───────────────────────────────────────────────────────────────
-// POST /jobs  — submit a new ingestion job
-app.post('/jobs', authenticate, (req, res) => {
-  const { source, source_type } = req.body;
-  if (!source || !source_type) {
-    return res.status(400).json({ error: 'source and source_type are required' });
-  }
-
-  ingestionClient.SubmitJob(
-    { source, source_type, user_id: req.user.user_id },
-    (err, response) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.status(202).json(response);
-    }
-  );
-});
-
-// GET /jobs/:jobId — poll job status
-app.get('/jobs/:jobId', authenticate, (req, res) => {
-  ingestionClient.GetJobStatus({ job_id: req.params.jobId }, (err, response) => {
-    if (err) {
-      if (err.code === 5) return res.status(404).json({ error: 'Job not found' });
-      return res.status(500).json({ error: err.message });
-    }
-    res.json(response);
-  });
-});
-
-// ── Result routes ─────────────────────────────────────────────────────────────
-// GET /results — list all results for the authenticated user
-app.get('/results', authenticate, (req, res) => {
-  const page      = parseInt(req.query.page      || '1',  10);
-  const page_size = parseInt(req.query.page_size || '10', 10);
-
-  storageClient.ListResults(
-    { user_id: req.user.user_id, page, page_size },
-    (err, response) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(response);
-    }
-  );
-});
-
-// GET /results/:resultId — get a single result
-app.get('/results/:resultId', authenticate, (req, res) => {
-  storageClient.GetResult(
-    { result_id: req.params.resultId, user_id: req.user.user_id },
-    (err, response) => {
-      if (err) {
-        if (err.code === 5) return res.status(404).json({ error: 'Result not found' });
-        return res.status(500).json({ error: err.message });
-      }
-      res.json(response.result);
-    }
-  );
-});
-
-// ── Start ─────────────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Gateway running on :${PORT}`));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT',  () => shutdown('SIGINT'));

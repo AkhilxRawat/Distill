@@ -4,7 +4,7 @@ const { Router }          = require('express');
 const { authenticate }    = require('../middleware/auth');
 const { validatePagination } = require('../middleware/validate');
 const { handleGrpcError }    = require('../middleware/errors');
-const { storageClient }      = require('../grpc/clients');
+const { storageClient }      = require('../grpc/client');
 
 const router = Router();
 

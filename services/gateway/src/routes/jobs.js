@@ -1,35 +1,49 @@
 'use strict';
 
-const { Router } = require('express');
-const { authLimiter } = require('../middleware/rateLimiter');
-const { issueToken }  = require('../middleware/auth');
+const { Router }          = require('express');
+const { authenticate }    = require('../middleware/auth');
+const { validateJobSubmit } = require('../middleware/validate');
+const { handleGrpcError }   = require('../middleware/errors');
+const { jobSubmitLimiter }  = require('../middleware/rateLimiter');
+const { ingestionClient, storageClient } = require('../grpc/client');
 
 const router = Router();
 
 /**
- * POST /auth/token
- * Issues a signed JWT for the given user_id.
+ * POST /jobs
+ * Submit a new distillation job.
  *
- * Body: { user_id: string, email?: string }
+ * Body: { source: string, source_type: SourceType }
  *
- * In production this should validate credentials against a user store
- * (bcrypt hash comparison, email verification, etc.).
- * For now it trusts whatever user_id is supplied — wired to a real
- * user-management service in a later phase.
+ * Response 200: { job_id: string, status: string }
  */
-router.post('/token', authLimiter, (req, res) => {
-  const { user_id, email } = req.body;
+router.post('/', authenticate, jobSubmitLimiter, validateJobSubmit, (req, res) => {
+  const { source, source_type } = req.body;
+  const user_id = req.user.user_id;
 
-  if (!user_id || typeof user_id !== 'string' || user_id.trim().length === 0) {
-    return res.status(400).json({
-      error:   'Validation Error',
-      message: 'user_id is required',
-    });
+  ingestionClient.SubmitJob({ source, source_type, user_id }, (err, response) => {
+    if (err) return handleGrpcError(err, res);
+    res.json(response);
+  });
+});
+
+/**
+ * GET /jobs/:jobId
+ * Get the current status of a job.
+ *
+ * Response 200: { job_id, status, error_message, created_at, updated_at }
+ */
+router.get('/:jobId', authenticate, (req, res) => {
+  const { jobId } = req.params;
+
+  if (!jobId || jobId.length < 10) {
+    return res.status(400).json({ error: 'Validation Error', message: 'Invalid job_id' });
   }
 
-  const token = issueToken(user_id.trim(), email);
-
-  res.json({ token, user_id: user_id.trim() });
+  ingestionClient.GetJobStatus({ job_id: jobId }, (err, response) => {
+    if (err) return handleGrpcError(err, res);
+    res.json(response);
+  });
 });
 
 module.exports = router;

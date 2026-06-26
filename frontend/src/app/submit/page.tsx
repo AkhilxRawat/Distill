@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { jobs, results } from '@/lib/api';
+import { jobs } from '@/lib/api';
 import Navbar from '@/components/Navbar';
-import StatusBadge from '@/components/StatusBadge';
+import StatusBar from '@/components/StatusBar';
+import { useJobStatus } from '@/lib/ws';
 
 const SOURCE_TYPES = [
   { value: 'SOURCE_TYPE_YOUTUBE_URL', label: 'YouTube URL' },
@@ -12,69 +13,35 @@ const SOURCE_TYPES = [
   { value: 'SOURCE_TYPE_RAW_TEXT',    label: 'Raw Text'    },
 ];
 
-type JobStatus =
-  | 'JOB_STATUS_QUEUED'
-  | 'JOB_STATUS_FETCHING'
-  | 'JOB_STATUS_PROCESSING'
-  | 'JOB_STATUS_COMPLETE'
-  | 'JOB_STATUS_FAILED'
-  | '';
-
 export default function SubmitPage() {
   const router = useRouter();
   const [source, setSource]         = useState('');
   const [sourceType, setSourceType] = useState('SOURCE_TYPE_YOUTUBE_URL');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState('');
-  const [jobId, setJobId]           = useState('');
-  const [status, setStatus]         = useState<JobStatus>('');
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
+
+  // Hook handles connection, subscription, and state updates
+  const { status, chunks, resultId } = useJobStatus(activeJobId);
 
   useEffect(() => {
     if (!localStorage.getItem('token')) router.push('/');
-  }, []);
+  }, [router]);
 
+  // Handle successful completion and redirect to results
   useEffect(() => {
-    if (!jobId) return;
+    if (resultId) {
+      router.push(`/results/${resultId}`);
+    }
+  }, [resultId, router]);
 
-    intervalRef.current = setInterval(async () => {
-      try {
-        const { data } = await jobs.getStatus(jobId);
-        setStatus(data.status);
-
-        if (data.status === 'JOB_STATUS_COMPLETE') {
-          clearInterval(intervalRef.current!);
-
-          // Wait briefly — storage write may still be in flight
-          await new Promise(res => setTimeout(res, 1500));
-
-          try {
-            const { data: listData } = await results.list(1, 1);
-            const newest = listData.results?.[0];
-            if (newest) {
-              router.push(`/results/${newest.result_id}`);
-            } else {
-              router.push('/dashboard');
-            }
-          } catch {
-            router.push('/dashboard');
-          }
-        }
-
-        if (data.status === 'JOB_STATUS_FAILED') {
-          clearInterval(intervalRef.current!);
-          setError(data.error_message || 'Job failed. Please try again.');
-          setJobId('');
-          setStatus('');
-        }
-      } catch {
-        clearInterval(intervalRef.current!);
-        setError('Lost connection while polling. Check your dashboard.');
-      }
-    }, 2000);
-
-    return () => clearInterval(intervalRef.current!);
-  }, [jobId]);
+  // Handle failure case
+  useEffect(() => {
+    if (status === 'JOB_STATUS_FAILED') {
+      setError('Job failed. Please check your content/url and try again.');
+      setActiveJobId(null);
+    }
+  }, [status]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -82,16 +49,16 @@ export default function SubmitPage() {
     setSubmitting(true);
     try {
       const { data } = await jobs.submit(source.trim(), sourceType);
-      setJobId(data.job_id);
-      setStatus('JOB_STATUS_QUEUED');
+      setActiveJobId(data.job_id);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Submission failed.');
+      setSubmitting(false);
     } finally {
       setSubmitting(false);
     }
   }
 
-  const isPolling = !!jobId &&
+  const isPolling = !!activeJobId &&
     status !== 'JOB_STATUS_COMPLETE' &&
     status !== 'JOB_STATUS_FAILED';
 
@@ -154,29 +121,7 @@ export default function SubmitPage() {
           )}
 
           {isPolling && (
-            <div className="flex items-center gap-3 bg-indigo-50 rounded-lg px-4 py-3">
-              <svg
-                className="animate-spin h-4 w-4 text-indigo-600"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12" cy="12" r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"
-                />
-              </svg>
-              <div>
-                <p className="text-sm font-medium text-indigo-700">Processing…</p>
-                <StatusBadge status={status} />
-              </div>
-            </div>
+            <StatusBar status={status} chunks={chunks} />
           )}
 
           <button

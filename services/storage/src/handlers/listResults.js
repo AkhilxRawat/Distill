@@ -1,7 +1,9 @@
 const Result = require('../db/models/result');
 
 async function listResults(call, callback) {
-  const { user_id, page = 1, page_size = 10 } = call.request;
+  const user_id = call.request.user_id;
+  const page = call.request.page || 1;
+  const page_size = call.request.page_size || 10;
 
   try {
     const skip  = (page - 1) * page_size;

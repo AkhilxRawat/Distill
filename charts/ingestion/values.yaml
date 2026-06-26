@@ -1,0 +1,25 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/akhilxrawat/distill-ingestion
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 50051
+
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 100m
+  limits:
+    memory: 256Mi
+    cpu: 200m
+
+env:
+  STORAGE_HOST: storage.distill-dev.svc.cluster.local
+  STORAGE_PORT: "50053"
+  PROCESSING_HOST: processing.distill-dev.svc.cluster.local
+  PROCESSING_PORT: "50052"
+  GATEWAY_URL: "http://gateway.distill-dev.svc.cluster.local:3000"

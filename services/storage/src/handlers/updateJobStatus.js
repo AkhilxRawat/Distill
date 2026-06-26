@@ -16,4 +16,4 @@ async function updateJobStatus(call, callback) {
   }
 }
 
-module.exports = { updateJobStatus };
+module.exports = { updateJobStatus }; 

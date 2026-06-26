@@ -1,11 +1,23 @@
 syntax = "proto3";
 package distill.storage.v1;
 service StorageService {
+  rpc CreateJob       (CreateJobRequest)       returns (CreateJobResponse);
   rpc SaveResult      (SaveResultRequest)      returns (SaveResultResponse);
   rpc GetResult       (GetResultRequest)       returns (GetResultResponse);
   rpc ListResults     (ListResultsRequest)     returns (ListResultsResponse);
   rpc UpdateJobStatus (UpdateJobStatusRequest) returns (UpdateJobStatusResponse);
   rpc GetJobStatus    (GetJobStatusRequest)    returns (GetJobStatusResponse);
+}
+
+message CreateJobRequest {
+  string job_id      = 1;
+  string user_id     = 2;
+  string source      = 3;
+  string source_type = 4;
+}
+
+message CreateJobResponse {
+  bool success = 1;
 }
 message SaveResultRequest {
   string          job_id            = 1;

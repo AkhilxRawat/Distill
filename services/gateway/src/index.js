@@ -6,7 +6,7 @@ const cors    = require('cors');
 
 const { apiLimiter }           = require('./middleware/rateLimiter');
 const { errorHandler }         = require('./middleware/errors');
-const { attachWebSocketServer } = require('./ws/jobStream');
+const { attachWebSocketServer, publishStatusUpdate } = require('./ws/jobStream');
 
 const authRoutes    = require('./routes/auth');
 const jobRoutes     = require('./routes/jobs');
@@ -32,6 +32,12 @@ app.use('/api', apiLimiter);
 app.get('/health', (_req, res) => res.json({ status: 'ok', ts: Date.now() }));
 
 // ── Routes ────────────────────────────────────────────────────────────────────
+app.post('/internal/jobs/:jobId/status', (req, res) => {
+  const { jobId } = req.params;
+  publishStatusUpdate(jobId, req.body);
+  res.sendStatus(200);
+});
+
 app.use('/auth',         authRoutes);
 app.use('/jobs',         jobRoutes);
 app.use('/results',      resultRoutes);

@@ -8,6 +8,7 @@ const { getResult }       = require('./handlers/getResult');
 const { listResults }     = require('./handlers/listResults');
 const { updateJobStatus } = require('./handlers/updateJobStatus');
 const { getJobStatus }    = require('./handlers/getJobStatus');
+const { createJob }       = require('./handlers/createJob');
 
 const PROTO_PATH = path.join(__dirname, '../proto/storage.proto');
 
@@ -27,6 +28,7 @@ async function main() {
   const server = new grpc.Server();
 
   server.addService(proto.StorageService.service, {
+    CreateJob:       createJob,
     SaveResult:      saveResult,
     GetResult:       getResult,
     ListResults:     listResults,

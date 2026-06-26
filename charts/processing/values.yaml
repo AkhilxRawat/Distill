@@ -1,0 +1,27 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/akhilxrawat/distill-processing
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 50052
+
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 100m
+  limits:
+    memory: 256Mi
+    cpu: 200m
+
+env:
+  STORAGE_HOST: storage.distill-dev.svc.cluster.local
+  STORAGE_PORT: "50053"
+
+# Supports secret references (like processing-secret created in Phase 4)
+envFrom:
+  - secretRef:
+      name: processing-secret

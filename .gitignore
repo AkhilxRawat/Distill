@@ -1,3 +1,5 @@
 ﻿node_modules/
 .env
 *.log
+test_yt.js
+test_list_models.js

@@ -1,9 +1,9 @@
-name: Build Processing Service
+name: Build Frontend Service
 
 on:
     push:
         paths:
-            - 'services/processing/**'
+            - 'services/frontend/**'
             - 'proto/**'
           
 jobs:

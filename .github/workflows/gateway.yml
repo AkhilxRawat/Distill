@@ -2,7 +2,6 @@ name: Build Gateway Service
 
 on:
   push:
-    branches: [main]
     paths:
       - 'services/gateway/**'
       - 'proto/**'

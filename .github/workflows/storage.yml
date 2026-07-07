@@ -1,0 +1,35 @@
+name: Build Storage Service
+
+on:
+    push:
+        paths:
+            - 'services/storage/**'
+            - 'proto/**'
+
+jobs:
+    build-and-push:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+         
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Log in to GHCR
+              uses: docker/Login-action@v3
+              with:
+                registry: ghcr.io
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}   
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v5 
+              with:
+                context: .
+                file: services/storage/Dockerfile
+                push: true
+                tags: |
+                    ghcr.io/${{ github.repository_owner }}/distill-storage:${{ github.sha }}
+                    ghcr.io/${{ github.repository_owner }}/distill-storage:latest

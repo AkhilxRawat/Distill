@@ -28,5 +28,5 @@ jobs:
             file: services/processing/Dockerfile
             push: true
             tags: |
-                 ghcr.io/AkhilxRawat/distill-processing:${{ github.sha }}
-                 ghcr.io/AkhilxRawat/distill-processing:latest     
+                 ghcr.io/akhilxrawat/distill-processing:${{ github.sha }}
+                 ghcr.io/akhilxrawat/distill-processing:latest     

@@ -1,0 +1,37 @@
+# ============================================================
+# charts/vso-values.yaml
+# Override values for the Vault Secrets Operator (VSO) Helm chart.
+#
+# Install command:
+#   helm install vault-secrets-operator \
+#     hashicorp/vault-secrets-operator \
+#     --namespace vault-secrets-operator-system \
+#     --create-namespace \
+#     -f charts/vso-values.yaml
+# ============================================================
+
+# Default VaultConnection that VSO will use when a CRD does not
+# specify an explicit vaultConnectionRef.
+defaultVaultConnection:
+  # Set to true to enable the default connection.
+  enabled: true
+  # Address of the Vault server reachable from inside the cluster.
+  # On Docker Desktop / k3d on Windows: host.docker.internal
+  # On Linux k3d: use the host's LAN IP, e.g. 172.17.0.1
+  address: "http://host.docker.internal:8200"
+  # Skip TLS verification for the dev server (no TLS in dev mode)
+  skipTLSVerify: false
+
+# Controller manager resource requests / limits (keep light for dev)
+controller:
+  manager:
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "200m"
+        memory: "128Mi"
+
+# Metrics / telemetry — disabled for local dev
+metricsAddr: "0"

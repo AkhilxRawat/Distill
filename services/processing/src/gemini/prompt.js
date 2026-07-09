@@ -13,3 +13,4 @@ Return only valid JSON. No markdown, no explanation outside the JSON.`;
 }
 
 module.exports = { buildPrompt };
+

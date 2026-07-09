@@ -7,11 +7,11 @@ on:
 
 jobs:
   build-and-push:
-   runs-on: ubuntu-latest
-   permissions:
+    runs-on: ubuntu-latest
+    permissions:
         contents: read
         packages: write
-   steps:
+    steps:
         - name: Checckout repository
           uses: actions/checkout@v4
         -  name: Log in to GHCR

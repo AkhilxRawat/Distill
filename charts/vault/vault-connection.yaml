@@ -1,0 +1,27 @@
+# ============================================================
+# charts/vault/vault-connection.yaml
+#
+# VaultConnection CRD — tells the Vault Secrets Operator (VSO)
+# where the HashiCorp Vault server lives.
+#
+# This resource must be in the same namespace as the workloads
+# that reference it (distill-dev).
+# ============================================================
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultConnection
+metadata:
+  name: distill-vault-connection
+  namespace: distill-dev
+spec:
+  # Address of the Vault server reachable from inside the cluster.
+  # Docker Desktop / k3d on Windows  → host.docker.internal
+  # Linux k3d (bridge network)       → <host LAN IP>, e.g. 172.17.0.1
+  address: "http://host.docker.internal:8200"
+
+  # Skip TLS verification (Vault dev mode has no TLS)
+  skipTLSVerify: false
+
+  # Optional: CA bundle for custom TLS (leave empty for dev)
+  # caCertSecretRef:
+  #   name: vault-ca-secret
+  #   key: ca.crt

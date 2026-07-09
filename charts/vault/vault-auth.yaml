@@ -1,0 +1,40 @@
+# ============================================================
+# charts/vault/vault-auth.yaml
+#
+# VaultAuth CRD — configures how VSO authenticates to Vault.
+# Uses the Kubernetes auth method so VSO's service account JWT
+# is exchanged for a Vault token automatically.
+# ============================================================
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: distill-vault-auth
+  namespace: distill-dev
+spec:
+  # Reference the VaultConnection defined in this namespace
+  vaultConnectionRef: distill-vault-connection
+
+  # Auth method type — "kubernetes" uses the cluster's service
+  # account tokens to authenticate against Vault
+  method: kubernetes
+
+  # The mount path of the Kubernetes auth method in Vault
+  # (configured by configure-k8s-auth.sh)
+  mount: kubernetes
+
+  kubernetes:
+    # Vault role that was created in configure-k8s-auth.sh
+    role: distill-processing
+
+    # Service account used by VSO to authenticate
+    # VSO's own service account lives in vault-secrets-operator-system
+    serviceAccount: vault-secrets-operator
+
+    # Audience for the projected service account token
+    # (leave as default "vault" unless your cluster differs)
+    audiences:
+      - vault
+
+  # How long Vault should cache the token before re-authenticating
+  # (must be ≤ the role's TTL configured in Vault)
+  tokenExpirationSeconds: 600

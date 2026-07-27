@@ -3,12 +3,17 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}
   labels:
-    app: {{ .Release.Name }}
+    app: processing
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
-    - port: {{ .Values.service.port }}
+    - name: grpc
+      port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.port }}
       protocol: TCP
+    - name: metrics
+      port: 9093
+      targetPort: 9093
+      protocol: TCP
   selector:
-    app: {{ .Release.Name }}
+    app: processing

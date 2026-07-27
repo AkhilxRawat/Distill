@@ -1,0 +1,109 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: distill-gateway
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/gateway
+    helm:
+      valueFiles:
+        - values/dev.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: distill-ingestion
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/ingestion
+    helm:
+      valueFiles:
+        - values/dev.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: distill-processing
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/processing
+    helm:
+      valueFiles:
+        - values/dev.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: distill-storage
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/storage
+    helm:
+      valueFiles:
+        - values/dev.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: distill-frontend
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/frontend
+    helm:
+      valueFiles:
+        - values/dev.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

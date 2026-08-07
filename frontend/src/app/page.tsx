@@ -52,7 +52,7 @@ export default function LoginPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email <span className="text-gray-400">(optional)</span>
+              Email <span className="text-gray-500">(optional)</span>
             </label>
             <input
               type="email"

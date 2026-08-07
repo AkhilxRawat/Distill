@@ -68,7 +68,7 @@ export default function SubmitPage() {
       <main className="max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-xl font-bold text-gray-800 mb-6">New Distillation</h1>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Source Type

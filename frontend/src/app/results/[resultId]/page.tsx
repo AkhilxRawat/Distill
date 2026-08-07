@@ -59,7 +59,7 @@ export default function ResultDetailPage() {
   if (loading) return (
     <>
       <Navbar />
-      <p className="text-center text-gray-400 mt-16 text-sm">Loading…</p>
+      <p className="text-center text-gray-500 mt-16 text-sm">Loading…</p>
     </>
   );
 
@@ -83,15 +83,15 @@ export default function ResultDetailPage() {
             <span className="text-xs font-medium bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
               {sourceLabel[result.source_type] ?? result.source_type}
             </span>
-            <p className="mt-1 text-xs text-gray-400 break-all">{result.source}</p>
+            <p className="mt-1 text-xs text-gray-500 break-all">{result.source}</p>
           </div>
-          <p className="text-xs text-gray-400 whitespace-nowrap">
+          <p className="text-xs text-gray-500 whitespace-nowrap">
             {new Date(result.created_at * 1000).toLocaleDateString()}
           </p>
         </div>
 
         {/* Summary */}
-        <section className="bg-white rounded-2xl border shadow-sm p-6">
+        <section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
             Summary
           </h2>
@@ -111,7 +111,7 @@ export default function ResultDetailPage() {
 
         {/* Key Entities */}
         {result.key_entities?.length > 0 && (
-          <section className="bg-white rounded-2xl border shadow-sm p-6">
+          <section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
             <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Key Entities
             </h2>
@@ -127,22 +127,22 @@ export default function ResultDetailPage() {
 
         {/* Q&A Pairs — accordion */}
         {result.qa_pairs?.length > 0 && (
-          <section className="bg-white rounded-2xl border shadow-sm p-6">
+          <section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
             <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Q &amp; A
             </h2>
             <div className="space-y-2">
               {result.qa_pairs.map((pair, i) => (
-                <div key={i} className="border rounded-lg overflow-hidden">
+                <div key={i} className="border border-gray-200 rounded-lg overflow-hidden">
                   <button
                     onClick={() => setOpenQA(openQA === i ? null : i)}
                     className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 flex justify-between items-center hover:bg-gray-50"
                   >
                     {pair.question}
-                    <span className="text-gray-400 ml-2">{openQA === i ? '▲' : '▼'}</span>
+                    <span className="text-gray-500 ml-2">{openQA === i ? '▲' : '▼'}</span>
                   </button>
                   {openQA === i && (
-                    <div className="px-4 py-3 text-sm text-gray-600 bg-gray-50 border-t">
+                    <div className="px-4 py-3 text-sm text-gray-600 bg-gray-50 border-t border-gray-200">
                       {pair.answer}
                     </div>
                   )}
@@ -154,11 +154,11 @@ export default function ResultDetailPage() {
 
         {/* Stats */}
         <div className="flex gap-4 text-center">
-          <div className="flex-1 bg-white rounded-2xl border shadow-sm p-4">
+          <div className="flex-1 bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
             <p className="text-2xl font-bold text-indigo-600">{result.readability_score}</p>
             <p className="text-xs text-gray-500 mt-1">Readability Score</p>
           </div>
-          <div className="flex-1 bg-white rounded-2xl border shadow-sm p-4">
+          <div className="flex-1 bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
             <p className="text-2xl font-bold text-indigo-600">
               {result.tokens_used.toLocaleString()}
             </p>

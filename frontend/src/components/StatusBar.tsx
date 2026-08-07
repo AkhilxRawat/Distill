@@ -55,7 +55,7 @@ export default function StatusBar({ status, chunks }: StatusBarProps) {
   const streamText = chunks.join('');
 
   return (
-    <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-gray-100 shadow-xl p-6 space-y-6 transition-all duration-300">
+    <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-gray-200 shadow-xl p-6 space-y-6 transition-all duration-300">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -67,7 +67,7 @@ export default function StatusBar({ status, chunks }: StatusBarProps) {
               </span>
             )}
           </h3>
-          <p className="text-sm text-gray-500">{info.description}</p>
+          <p className="text-sm text-gray-600">{info.description}</p>
         </div>
         <StatusBadge status={status} />
       </div>
@@ -98,11 +98,11 @@ export default function StatusBar({ status, chunks }: StatusBarProps) {
             <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">
               Live Stream Preview
             </span>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-500">
               {streamText.length} chars received
             </span>
           </div>
-          <div className="bg-gray-50/50 border border-gray-100 rounded-xl p-4 max-h-40 overflow-y-auto scrollbar-thin">
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 max-h-40 overflow-y-auto scrollbar-thin">
             <p className="text-sm text-gray-700 leading-relaxed font-mono whitespace-pre-wrap">
               {streamText}
               <span className="inline-block w-1.5 h-4 ml-0.5 bg-indigo-600 animate-pulse" />

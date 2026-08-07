@@ -61,7 +61,7 @@ export default function DashboardPage() {
           <h1 className="text-xl font-bold text-gray-800">
             Your Distillations
             {total > 0 && (
-              <span className="ml-2 text-sm font-normal text-gray-400">
+              <span className="ml-2 text-sm font-normal text-gray-500">
                 ({total} total)
               </span>
             )}
@@ -75,7 +75,7 @@ export default function DashboardPage() {
         </div>
 
         {loading && (
-          <p className="text-gray-400 text-sm">Loading…</p>
+          <p className="text-gray-500 text-sm">Loading…</p>
         )}
 
         {error && (
@@ -83,7 +83,7 @@ export default function DashboardPage() {
         )}
 
         {!loading && items.length === 0 && !error && (
-          <div className="text-center py-16 text-gray-400">
+          <div className="text-center py-16 text-gray-500">
             <p className="text-lg mb-2">No distillations yet.</p>
             <Link href="/submit" className="text-indigo-600 hover:underline text-sm">
               Submit your first one →
@@ -102,7 +102,7 @@ export default function DashboardPage() {
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-3 py-1 text-sm border rounded-lg disabled:opacity-40"
+              className="px-3 py-1 text-sm border border-gray-300 rounded-lg disabled:opacity-40"
             >
               ← Prev
             </button>
@@ -112,7 +112,7 @@ export default function DashboardPage() {
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-3 py-1 text-sm border rounded-lg disabled:opacity-40"
+              className="px-3 py-1 text-sm border border-gray-300 rounded-lg disabled:opacity-40"
             >
               Next →
             </button>

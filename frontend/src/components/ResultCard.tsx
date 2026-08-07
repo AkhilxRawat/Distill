@@ -21,18 +21,18 @@ export default function ResultCard({ result }: Props) {
   return (
     <Link
       href={`/results/${result.result_id}`}
-      className="block bg-white border rounded-2xl shadow-sm p-5 hover:shadow-md transition"
+      className="block bg-white border border-gray-200 rounded-2xl shadow-sm p-5 hover:shadow-md transition"
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-medium bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
           {TYPE_LABEL[result.source_type] ?? result.source_type}
         </span>
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-gray-500">
           {new Date(result.created_at * 1000).toLocaleDateString()}
         </span>
       </div>
 
-      <p className="text-xs text-gray-400 truncate mb-2">{result.source}</p>
+      <p className="text-xs text-gray-500 truncate mb-2">{result.source}</p>
 
       <p className="text-sm text-gray-700 line-clamp-2 leading-relaxed">
         {result.summary}

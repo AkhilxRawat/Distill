@@ -1,5 +1,8 @@
 'use strict';
 
+require('./tracing');
+require('./metrics');
+
 const http    = require('http');
 const express = require('express');
 const cors    = require('cors');

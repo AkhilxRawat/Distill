@@ -9,6 +9,9 @@ service:
   type: ClusterIP
   port: 50051
 
+serviceMonitor:
+  enabled: true
+
 resources:
   requests:
     memory: 128Mi
@@ -23,3 +26,4 @@ env:
   PROCESSING_HOST: processing.distill-dev.svc.cluster.local
   PROCESSING_PORT: "50052"
   GATEWAY_URL: "http://gateway.distill-dev.svc.cluster.local:3000"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo.observability.svc.cluster.local:4318"

@@ -10,11 +10,14 @@ services:
     build:
       context: .
       dockerfile: services/ingestion/Dockerfile
+    ports:
+      - "9092:9092"
     environment:
       - STORAGE_HOST=storage
       - STORAGE_PORT=50053
       - PROCESSING_HOST=processing
       - PROCESSING_PORT=50052
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318
     depends_on:
       - mongodb
       - storage
@@ -24,10 +27,13 @@ services:
     build:
       context: .
       dockerfile: services/processing/Dockerfile
+    ports:
+      - "9093:9093"
     environment:
       - STORAGE_HOST=storage
       - STORAGE_PORT=50053
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318
     depends_on:
       - mongodb
       - storage
@@ -36,8 +42,11 @@ services:
     build:
       context: .
       dockerfile: services/storage/Dockerfile
+    ports:
+      - "9094:9094"
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/distill
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318
     depends_on:
       - mongodb
 
@@ -47,16 +56,18 @@ services:
       dockerfile: services/gateway/Dockerfile
     ports:
       - "3000:3000"
+      - "9091:9091"
     environment:
       - INGESTION_HOST=ingestion
       - INGESTION_PORT=50051
       - STORAGE_HOST=storage
       - STORAGE_PORT=50053
       - JWT_SECRET=${JWT_SECRET}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318
     depends_on:
       - ingestion
       - storage
-  
+
   frontend:
     build:
       context: .
@@ -64,11 +75,11 @@ services:
       args:
         NEXT_PUBLIC_API_URL: http://localhost:3000
     ports:
-      - "3001:3000"
+      - "4000:3000"
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:3000
     depends_on:
       - gateway
-  
+
 volumes:
   mongo_data:

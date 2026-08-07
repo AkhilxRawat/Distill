@@ -11,27 +11,6 @@ spec:
     - host: {{ .Values.ingress.host }}
       http:
         paths:
-          - path: /auth
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ .Release.Name }}
-                port:
-                  number: {{ .Values.service.port }}
-          - path: /jobs
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ .Release.Name }}
-                port:
-                  number: {{ .Values.service.port }}
-          - path: /results
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ .Release.Name }}
-                port:
-                  number: {{ .Values.service.port }}
           - path: /ws
             pathType: Prefix
             backend:

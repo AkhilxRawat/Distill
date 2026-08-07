@@ -20,6 +20,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.port }}
+            - containerPort: 9092
+              name: metrics
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:

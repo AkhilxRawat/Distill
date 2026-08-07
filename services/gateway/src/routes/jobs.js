@@ -5,7 +5,8 @@ const { authenticate }    = require('../middleware/auth');
 const { validateJobSubmit } = require('../middleware/validate');
 const { handleGrpcError }   = require('../middleware/errors');
 const { jobSubmitLimiter }  = require('../middleware/rateLimiter');
-const { ingestionClient, storageClient } = require('../grpc/client');
+const { ingestionClient } = require('../grpc/client');
+const { submissionsTotal, activeJobs } = require('../metrics');
 
 const router = Router();
 
@@ -19,10 +20,16 @@ const router = Router();
  */
 router.post('/', authenticate, jobSubmitLimiter, validateJobSubmit, (req, res) => {
   const { source, source_type } = req.body;
-  const user_id = req.user.user_id;
+  const user_id = req.user.user_id || req.user.userId;
+
+  submissionsTotal.inc({ source_type: source_type || 'SOURCE_TYPE_UNSPECIFIED' });
+  activeJobs.inc();
 
   ingestionClient.SubmitJob({ source, source_type, user_id }, (err, response) => {
-    if (err) return handleGrpcError(err, res);
+    if (err) {
+      activeJobs.dec();
+      return handleGrpcError(err, res);
+    }
     res.json(response);
   });
 });

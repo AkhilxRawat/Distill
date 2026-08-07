@@ -9,7 +9,7 @@ const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventi
 
 const sdk = new NodeSDK({
   resource: resourceFromAttributes({
-    [SemanticResourceAttributes.SERVICE_NAME]: process.env.SERVICE_NAME || 'distill-storage',
+    [SemanticResourceAttributes.SERVICE_NAME]: process.env.SERVICE_NAME || 'distill-processing',
   }),
   traceExporter: new OTLPTraceExporter({
     url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT

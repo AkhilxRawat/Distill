@@ -8,6 +8,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'distill-secret-change-me';
 // Map: jobId -> Set of WebSocket client connections
 const activeSubscriptions = new Map();
 
+// Map: jobId -> most recent status event, so a client that subscribes
+// after the event fired (e.g. a very fast/mocked pipeline) still gets it.
+const lastEventByJob = new Map();
+
 function attachWebSocketServer(httpServer) {
   // Mount on /ws path to match client
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
@@ -54,6 +58,13 @@ function attachWebSocketServer(httpServer) {
           activeSubscriptions.set(jobId, new Set());
         }
         activeSubscriptions.get(jobId).add(ws);
+
+        // Replay the last known event in case it fired before this
+        // subscription was established.
+        const lastEvent = lastEventByJob.get(jobId);
+        if (lastEvent && ws.readyState === ws.OPEN) {
+          ws.send(JSON.stringify({ jobId, ...lastEvent }));
+        }
       }
 
       // Handle "unsubscribe" message
@@ -94,12 +105,28 @@ function attachWebSocketServer(httpServer) {
   return wss;
 }
 
+const { activeJobs } = require('../metrics');
+
 /**
  * Publishes a status update to all clients subscribed to a specific jobId.
  * @param {string} jobId
  * @param {object} event
  */
 function publishStatusUpdate(jobId, event) {
+  const isTerminal = event && (event.type === 'complete' || event.type === 'error' ||
+    event.status === 'complete' || event.status === 'failed' ||
+    event.stage === 'PROCESS_STAGE_COMPLETE' || event.stage === 'PROCESS_STAGE_FAILED');
+
+  if (isTerminal) {
+    activeJobs.dec();
+  }
+
+  lastEventByJob.set(jobId, event);
+  if (isTerminal) {
+    // Bound memory — give late subscribers a window to catch up, then forget.
+    setTimeout(() => lastEventByJob.delete(jobId), 60_000).unref();
+  }
+
   const subs = activeSubscriptions.get(jobId);
   if (subs) {
     const payload = JSON.stringify({ jobId, ...event });

@@ -3,39 +3,45 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}
   labels:
-    app: {{ .Release.Name }}
+    app: mongodb
 spec:
   replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
-      app: {{ .Release.Name }}
+      app: mongodb
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}
+        app: mongodb
     spec:
       containers:
-        - name: {{ .Chart.Name }}
+        - name: mongodb
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.service.port }}
-            - containerPort: 9094
-              name: metrics
+            - containerPort: 27017
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          env:
-            {{- range $key, $value := .Values.env }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
-            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
           livenessProbe:
             tcpSocket:
-              port: {{ .Values.service.port }}
+              port: 27017
             initialDelaySeconds: 10
             periodSeconds: 30
           readinessProbe:
             tcpSocket:
-              port: {{ .Values.service.port }}
+              port: 27017
             initialDelaySeconds: 5
             periodSeconds: 10
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

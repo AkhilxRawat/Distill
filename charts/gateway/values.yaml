@@ -9,6 +9,9 @@ service:
   type: ClusterIP
   port: 3000
 
+serviceMonitor:
+  enabled: true
+
 ingress:
   enabled: true
   className: nginx
@@ -35,3 +38,4 @@ env:
   STORAGE_HOST: storage.distill-dev.svc.cluster.local
   STORAGE_PORT: "50053"
   JWT_SECRET: "distill-secret-change-me"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo.observability.svc.cluster.local:4318"

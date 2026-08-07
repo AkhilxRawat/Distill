@@ -9,6 +9,9 @@ service:
   type: ClusterIP
   port: 50052
 
+serviceMonitor:
+  enabled: true
+
 resources:
   requests:
     memory: 128Mi
@@ -20,6 +23,7 @@ resources:
 env:
   STORAGE_HOST: storage.distill-dev.svc.cluster.local
   STORAGE_PORT: "50053"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo.observability.svc.cluster.local:4318"
 
 # Supports secret references (like processing-secret created in Phase 4)
 envFrom:

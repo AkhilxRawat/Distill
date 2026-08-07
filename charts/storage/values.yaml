@@ -9,6 +9,9 @@ service:
   type: ClusterIP
   port: 50053
 
+serviceMonitor:
+  enabled: true
+
 resources:
   requests:
     memory: 128Mi
@@ -19,3 +22,4 @@ resources:
 
 env:
   MONGODB_URI: "mongodb://mongodb.distill-dev.svc.cluster.local:27017/distill"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo.observability.svc.cluster.local:4318"

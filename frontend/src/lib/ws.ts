@@ -10,16 +10,23 @@ export function useJobStatus(jobId: string | null) {
     if (!jobId) return;
 
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    
-    // Parse the host/port for WS connection
-    let wsUrl = 'ws://localhost:3000/ws';
-    try {
-      const url = new URL(baseURL);
-      const wsProto = url.protocol === 'https:' ? 'wss:' : 'ws:';
-      wsUrl = `${wsProto}//${url.host}/ws?token=${token}`;
-    } catch (e) {
-      wsUrl = `ws://localhost:3000/ws?token=${token}`;
+    const baseURL = process.env.NEXT_PUBLIC_API_URL;
+
+    // Empty/unset baseURL means "same origin" (matches lib/api.ts's axios
+    // baseURL behavior) — derive host from the page itself rather than
+    // falling back to a hardcoded localhost that's wrong in any deployed env.
+    let wsUrl;
+    if (baseURL) {
+      try {
+        const url = new URL(baseURL);
+        const wsProto = url.protocol === 'https:' ? 'wss:' : 'ws:';
+        wsUrl = `${wsProto}//${url.host}/ws?token=${token}`;
+      } catch (e) {
+        wsUrl = `ws://localhost:3000/ws?token=${token}`;
+      }
+    } else {
+      const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      wsUrl = `${wsProto}//${window.location.host}/ws?token=${token}`;
     }
 
     const ws = new WebSocket(wsUrl);

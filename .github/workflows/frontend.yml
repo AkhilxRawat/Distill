@@ -3,8 +3,7 @@ name: Build Frontend Service
 on:
     push:
         paths:
-            - 'services/frontend/**'
-            - 'proto/**'
+            - 'frontend/**'
           
 jobs:
     build-and-push:
@@ -27,8 +26,8 @@ jobs:
               uses: docker/build-push-action@v5
               with:
                 context: .
-                file: services/processing/DockerFile
+                file: frontend/Dockerfile
                 push: true
                 tags: |
-                    ghcr.io/akhilxrawat/distill-processing:${{ github.sha }}
-                    ghcr.io/akhilxrawat/distill-processing:latest    
+                    ghcr.io/akhilxrawat/distill-frontend:${{ github.sha }}
+                    ghcr.io/akhilxrawat/distill-frontend:latest

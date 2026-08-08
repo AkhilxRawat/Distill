@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Link from 'next/link';
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
     topic_tags: string[];
     created_at: number;
   };
+  onDelete?: (resultId: string) => void;
 }
 
 const TYPE_LABEL: Record<string, string> = {
@@ -17,11 +19,28 @@ const TYPE_LABEL: Record<string, string> = {
   SOURCE_TYPE_RAW_TEXT:    'Text',
 };
 
-export default function ResultCard({ result }: Props) {
+export default function ResultCard({ result, onDelete }: Props) {
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (deleting || !onDelete) return;
+    if (!window.confirm('Delete this distillation? This cannot be undone.')) return;
+
+    setDeleting(true);
+    try {
+      await onDelete(result.result_id);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <Link
       href={`/results/${result.result_id}`}
-      className="block bg-white border border-gray-200 rounded-2xl shadow-sm p-5 hover:shadow-md transition"
+      className="relative block bg-white border border-gray-200 rounded-2xl shadow-sm p-5 pb-12 hover:shadow-md transition"
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-medium bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
@@ -47,6 +66,16 @@ export default function ResultCard({ result }: Props) {
           ))}
         </div>
       )}
+
+      <button
+        type="button"
+        onClick={handleDelete}
+        disabled={deleting}
+        aria-label="Delete distillation"
+        className="absolute bottom-3 right-3 text-xs font-medium text-red-500 hover:text-white hover:bg-red-500 border border-red-200 hover:border-red-500 px-2 py-1 rounded-lg transition disabled:opacity-40"
+      >
+        {deleting ? 'Deleting…' : 'Delete'}
+      </button>
     </Link>
   );
 }

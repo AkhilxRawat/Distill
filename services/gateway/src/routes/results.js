@@ -56,4 +56,28 @@ router.get('/:resultId', (req, res) => {
   );
 });
 
+/**
+ * DELETE /results/:resultId
+ * Delete a single distilled result.
+ * Enforces ownership — users can only delete their own results.
+ *
+ * Response 200: { success: true }
+ * Response 404: result not found (or belongs to another user)
+ */
+router.delete('/:resultId', (req, res) => {
+  const { resultId } = req.params;
+
+  if (!resultId || resultId.length < 10) {
+    return res.status(400).json({ error: 'Validation Error', message: 'Invalid result_id' });
+  }
+
+  storageClient.DeleteResult(
+    { result_id: resultId, user_id: req.user.user_id },
+    (err, response) => {
+      if (err) return handleGrpcError(err, res);
+      res.json(response);
+    }
+  );
+});
+
 module.exports = router;

@@ -22,7 +22,7 @@ app.set('trust proxy', 1); // trust X-Forwarded-For from load balancers
 
 app.use(cors({
   origin:  process.env.CORS_ORIGIN || '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 

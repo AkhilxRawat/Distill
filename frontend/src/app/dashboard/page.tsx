@@ -51,6 +51,20 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleDelete(resultId: string) {
+    try {
+      await results.remove(resultId);
+      setItems(prev => prev.filter(item => item.result_id !== resultId));
+      setTotal(t => Math.max(0, t - 1));
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        router.push('/');
+      } else {
+        setError('Failed to delete distillation.');
+      }
+    }
+  }
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
@@ -93,7 +107,7 @@ export default function DashboardPage() {
 
         <div className="space-y-4">
           {items.map(item => (
-            <ResultCard key={item.result_id} result={item} />
+            <ResultCard key={item.result_id} result={item} onDelete={handleDelete} />
           ))}
         </div>
 

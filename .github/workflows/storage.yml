@@ -18,7 +18,7 @@ jobs:
               uses: actions/checkout@v4
 
             - name: Log in to GHCR
-              uses: docker/Login-action@v3
+              uses: docker/login-action@v3
               with:
                 registry: ghcr.io
                 username: ${{ github.actor }}
@@ -31,5 +31,5 @@ jobs:
                 file: services/storage/Dockerfile
                 push: true
                 tags: |
-                    ghcr.io/akhilxrawat/distill-processing:${{ github.sha }}
-                    ghcr.io/akhilxrawat/distill-processing:latest 
+                    ghcr.io/akhilxrawat/distill-storage:${{ github.sha }}
+                    ghcr.io/akhilxrawat/distill-storage:latest

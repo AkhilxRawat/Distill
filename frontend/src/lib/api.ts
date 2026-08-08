@@ -41,4 +41,6 @@ export const results = {
     api.get('/api/results', { params: { page, page_size } }),
   get: (resultId: string) =>
     api.get(`/api/results/${resultId}`),
+  remove: (resultId: string) =>
+    api.delete(`/api/results/${resultId}`),
 };

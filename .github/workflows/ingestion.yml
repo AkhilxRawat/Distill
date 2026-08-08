@@ -27,8 +27,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: services/gateway/Dockerfile
+          file: services/ingestion/Dockerfile
           push: true
           tags: |
-              ghcr.io/akhilxrawat/distill-processing:${{ github.sha }}
-              ghcr.io/akhilxrawat/distill-processing:latest 
+              ghcr.io/akhilxrawat/distill-ingestion:${{ github.sha }}
+              ghcr.io/akhilxrawat/distill-ingestion:latest

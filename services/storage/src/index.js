@@ -11,6 +11,7 @@ const { connect } = require('./db/connection');
 const { saveResult }      = require('./handlers/saveResult');
 const { getResult }       = require('./handlers/getResult');
 const { listResults }     = require('./handlers/listResults');
+const { deleteResult }    = require('./handlers/deleteResult');
 const { updateJobStatus } = require('./handlers/updateJobStatus');
 const { getJobStatus }    = require('./handlers/getJobStatus');
 const { createJob }       = require('./handlers/createJob');
@@ -37,6 +38,7 @@ async function main() {
     SaveResult:      saveResult,
     GetResult:       getResult,
     ListResults:     listResults,
+    DeleteResult:    deleteResult,
     UpdateJobStatus: updateJobStatus,
     GetJobStatus:    getJobStatus,
   });

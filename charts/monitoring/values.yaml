@@ -1,0 +1,82 @@
+# kube-prometheus-stack values for the distill-dev minikube cluster.
+#
+# Installed as Helm release name "monitoring" — this is not cosmetic.
+# charts/argocd/applications.yaml's distill-tempo block already hardcodes
+# `serviceMonitor.labels.release: monitoring` and remote-writes to
+# prometheus-operated.observability.svc.cluster.local:9090, which is
+# kube-prometheus-stack's default Prometheus service name *only* when
+# installed under this release name. Renaming it breaks that wiring.
+
+prometheus:
+  prometheusSpec:
+    retention: 12h
+    resources:
+      requests: { cpu: 100m, memory: 256Mi }
+      limits: { memory: 512Mi }
+    # Pick up ServiceMonitors/PodMonitors across all namespaces by label,
+    # not just ones created by this same Helm release.
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests: { cpu: 50m, memory: 64Mi }
+      limits: { memory: 128Mi }
+
+grafana:
+  adminPassword: "distill-admin"
+  defaultDashboardsEnabled: true
+  resources:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { memory: 256Mi }
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.distill.local
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      searchNamespace: ALL
+    datasources:
+      # Every service's histograms carry a `trace_id` exemplar label
+      # (see services/*/src/metrics.js — `timer(undefined, { trace_id })`).
+      # This makes those exemplar dots in Grafana clickable straight into Tempo.
+      exemplarTraceIdDestinations:
+        datasourceUid: tempo
+        traceIdLabelName: trace_id
+        urlDisplayLabel: "View trace"
+  additionalDataSources:
+    - name: Tempo
+      uid: tempo
+      type: tempo
+      access: proxy
+      url: http://tempo.observability.svc.cluster.local:3200
+      jsonData:
+        tracesToMetrics:
+          datasourceUid: prometheus
+        serviceMap:
+          datasourceUid: prometheus
+
+kubeStateMetrics:
+  enabled: true
+
+nodeExporter:
+  enabled: true
+
+# Single-node minikube: control-plane component scraping just adds noise
+# (kube-scheduler/controller-manager aren't exposed the way the chart
+# expects on minikube) and errors in Prometheus targets.
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeProxy:
+  enabled: false

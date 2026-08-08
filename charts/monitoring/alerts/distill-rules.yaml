@@ -1,0 +1,48 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: distill-app-alerts
+  namespace: observability
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: distill.pod-restarts
+      rules:
+        - alert: DistillPodRestartingFrequently
+          expr: |
+            increase(kube_pod_container_status_restarts_total{namespace="distill-dev"}[15m]) > 3
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{ $labels.pod }} in distill-dev is restarting frequently"
+            description: >-
+              Container {{ $labels.container }} in pod {{ $labels.pod }} has restarted
+              {{ $value }} times in the last 15 minutes.
+
+    - name: distill.error-rate
+      rules:
+        - alert: DistillHighErrorRate
+          expr: |
+            sum(rate(distill_errors_total[5m])) by (service) > 0.1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High error rate in {{ $labels.service }}"
+            description: >-
+              {{ $labels.service }} is logging more than 0.1 errors/sec
+              (~6+/min) averaged over 5 minutes.
+
+        - alert: DistillErrorRateCritical
+          expr: |
+            sum(rate(distill_errors_total[5m])) by (service) > 1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Critical error rate in {{ $labels.service }}"
+            description: >-
+              {{ $labels.service }} is logging more than 1 error/sec averaged
+              over 5 minutes — this is well above normal traffic-driven noise.

@@ -1,0 +1,18 @@
+# Extracted verbatim from charts/argocd/applications.yaml's distill-tempo
+# Application (which is never actually reconciled since ArgoCD isn't
+# installed in this cluster) so it can be applied directly via `helm install`.
+tempo:
+  receivers:
+    otlp:
+      protocols:
+        http:
+          endpoint: 0.0.0.0:4318
+        grpc:
+          endpoint: 0.0.0.0:4317
+  metricsGenerator:
+    enabled: true
+    remoteWriteUrl: http://prometheus-operated.observability.svc.cluster.local:9090/api/v1/write
+serviceMonitor:
+  enabled: true
+  labels:
+    release: monitoring

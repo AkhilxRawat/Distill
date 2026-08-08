@@ -56,6 +56,11 @@ grafana:
       uid: tempo
       type: tempo
       access: proxy
+      # Verified by exec'ing into tempo-0 and checking listening ports —
+      # this changed between chart versions (was 3100 on chart 1.10.1,
+      # is 3200 on chart 1.24.4). Re-verify with
+      # `kubectl exec tempo-0 -- wget -qO- http://localhost:<port>/api/echo`
+      # after any future tempo chart version bump.
       url: http://tempo.observability.svc.cluster.local:3200
       jsonData:
         tracesToMetrics:

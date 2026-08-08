@@ -12,6 +12,20 @@ tempo:
   metricsGenerator:
     enabled: true
     remoteWriteUrl: http://prometheus-operated.observability.svc.cluster.local:9090/api/v1/write
+    processor:
+      local_blocks:
+        flush_to_storage: true
+  # Chart auto-populates service-graphs + span-metrics once metricsGenerator
+  # is enabled, but not local-blocks — that's the processor that powers
+  # TraceQL metrics (Grafana's Traces Drilldown app needs it; without it
+  # you get "TraceQL metrics not configured").
+  overrides:
+    defaults:
+      metrics_generator:
+        processors:
+          - service-graphs
+          - span-metrics
+          - local-blocks
 serviceMonitor:
   enabled: true
   labels:

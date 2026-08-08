@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/akhilxrawat/distill-storage
-  tag: latest
+  tag: "6056736cdadd3dc6a977a86152b094c4860b0a99"
   pullPolicy: IfNotPresent
 
 service:

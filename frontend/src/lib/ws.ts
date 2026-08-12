@@ -12,17 +12,17 @@ export function useJobStatus(jobId: string | null) {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
     const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
-    // baseURL is baked in at build time, so its hostname (e.g. "localhost")
-    // is wrong for anyone loading the page from a different machine. Keep
-    // the port from the env var but derive the host from the page itself.
+    // Empty/unset baseURL means "same origin" (matches lib/api.ts's axios
+    // baseURL behavior) — nginx proxies /ws to the gateway on the same
+    // origin as the frontend, so this is the normal path.
     let wsUrl;
     if (baseURL) {
       try {
         const url = new URL(baseURL);
         const wsProto = url.protocol === 'https:' ? 'wss:' : 'ws:';
-        wsUrl = `${wsProto}//${window.location.hostname}:${url.port}/ws?token=${token}`;
+        wsUrl = `${wsProto}//${url.host}/ws?token=${token}`;
       } catch (e) {
-        wsUrl = `ws://${window.location.hostname}:3000/ws?token=${token}`;
+        wsUrl = `ws://localhost:3000/ws?token=${token}`;
       }
     } else {
       const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';

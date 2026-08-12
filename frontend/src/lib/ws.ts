@@ -12,17 +12,17 @@ export function useJobStatus(jobId: string | null) {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
     const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
-    // Empty/unset baseURL means "same origin" (matches lib/api.ts's axios
-    // baseURL behavior) — derive host from the page itself rather than
-    // falling back to a hardcoded localhost that's wrong in any deployed env.
+    // baseURL is baked in at build time, so its hostname (e.g. "localhost")
+    // is wrong for anyone loading the page from a different machine. Keep
+    // the port from the env var but derive the host from the page itself.
     let wsUrl;
     if (baseURL) {
       try {
         const url = new URL(baseURL);
         const wsProto = url.protocol === 'https:' ? 'wss:' : 'ws:';
-        wsUrl = `${wsProto}//${url.host}/ws?token=${token}`;
+        wsUrl = `${wsProto}//${window.location.hostname}:${url.port}/ws?token=${token}`;
       } catch (e) {
-        wsUrl = `ws://localhost:3000/ws?token=${token}`;
+        wsUrl = `ws://${window.location.hostname}:3000/ws?token=${token}`;
       }
     } else {
       const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';

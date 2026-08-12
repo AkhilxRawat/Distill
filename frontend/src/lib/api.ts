@@ -1,6 +1,22 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_API_URL });
+// NEXT_PUBLIC_API_URL is baked in at build time, so its hostname (e.g.
+// "localhost") is wrong for anyone loading the page from a different
+// machine. Keep the port from the env var but resolve the host from the
+// page itself, so it always points at whatever machine actually served it.
+function resolveBaseURL(): string | undefined {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (typeof window === 'undefined' || !envUrl) return envUrl;
+
+  try {
+    const url = new URL(envUrl);
+    return `${window.location.protocol}//${window.location.hostname}:${url.port}`;
+  } catch {
+    return envUrl;
+  }
+}
+
+const api = axios.create({ baseURL: resolveBaseURL() });
 
 // Attach JWT from localStorage on every request
 api.interceptors.request.use(config => {

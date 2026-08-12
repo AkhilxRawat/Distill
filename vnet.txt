@@ -1,8 +1,61 @@
 services:
+  tempo:
+    image: grafana/tempo:2.6.1
+    command: ["-config.file=/etc/tempo.yaml"]
+    networks:
+      - internal
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--enable-feature=exemplar-storage"
+      - "--web.enable-remote-write-receiver"
+    networks:
+      - internal
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    networks:
+      - public
+      - internal
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    volumes:
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    depends_on:
+      - prometheus
+      - tempo
+
+networks:
+  public:
+  internal:
+
+
+
+
+
+
+
+
+
+
+
+
+
+services:
   mongodb:
     image: mongo:7
     networks:
-      - backend
+      - internal
     volumes:
       - mongo_data:/data/db
 
@@ -11,8 +64,7 @@ services:
       context: .
       dockerfile: services/ingestion/Dockerfile
     networks:
-      - backend
-      - observability
+      - internal
     environment:
       - STORAGE_HOST=storage
       - STORAGE_PORT=50053
@@ -29,8 +81,7 @@ services:
       context: .
       dockerfile: services/processing/Dockerfile
     networks:
-      - backend
-      - observability
+      - internal
     environment:
       - STORAGE_HOST=storage
       - STORAGE_PORT=50053
@@ -45,8 +96,7 @@ services:
       context: .
       dockerfile: services/storage/Dockerfile
     networks:
-      - backend
-      - observability
+      - internal
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/distill
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318
@@ -59,8 +109,7 @@ services:
       dockerfile: services/gateway/Dockerfile
     networks:
       - public
-      - backend
-      - observability
+      - internal
     ports:
       - "127.0.0.1:3000:3000"
     environment:
@@ -91,8 +140,15 @@ services:
 
 networks:
   public:
-  backend:
-  observability:
+  internal:
 
 volumes:
   mongo_data:
+
+
+
+
+
+
+
+

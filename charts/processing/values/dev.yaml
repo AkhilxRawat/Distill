@@ -1,4 +1,6 @@
 replicaCount: 1
+image:
+  tag: "latest" # never pinned yet — next push to services/processing/** will have CI set a real SHA here
 resources:
   limits:
     memory: "256Mi"

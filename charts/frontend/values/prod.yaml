@@ -1,4 +1,6 @@
 replicaCount: 2
+image:
+  tag: "14f9ba2f2dc62bd6509dfdb3e5b1efbb87d96d12"
 resources:
   requests:
     memory: "256Mi"

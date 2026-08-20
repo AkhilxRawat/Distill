@@ -19,6 +19,8 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -41,6 +43,8 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -63,6 +67,8 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -85,6 +91,8 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -107,6 +115,128 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: distill-gateway-main
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/gateway
+    helm:
+      valueFiles:
+        - values/prod.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: distill-ingestion-main
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/ingestion
+    helm:
+      valueFiles:
+        - values/prod.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: distill-processing-main
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/processing
+    helm:
+      valueFiles:
+        - values/prod.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: distill-storage-main
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/storage
+    helm:
+      valueFiles:
+        - values/prod.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: distill-frontend-main
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/frontend
+    helm:
+      valueFiles:
+        - values/prod.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application

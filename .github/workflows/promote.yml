@@ -1,0 +1,52 @@
+name: Promote to main
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to promote (or "all")'
+        required: true
+        type: choice
+        options:
+          - all
+          - gateway
+          - frontend
+          - ingestion
+          - processing
+          - storage
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Promote dev tag(s) to prod
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          services="${{ github.event.inputs.service }}"
+          if [ "$services" = "all" ]; then
+            services="gateway frontend ingestion processing storage"
+          fi
+
+          for svc in $services; do
+            tag=$(yq '.image.tag' "charts/$svc/values/dev.yaml")
+            yq -i ".image.tag = \"$tag\"" "charts/$svc/values/prod.yaml"
+            git add "charts/$svc/values/prod.yaml"
+          done
+
+          if git diff --staged --quiet; then
+            echo "Nothing to promote — prod already matches dev for: ${services}"
+            exit 0
+          fi
+
+          git commit -m "chore: promote ${services} to main [skip ci]"
+
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push && break
+            sleep 3
+          done

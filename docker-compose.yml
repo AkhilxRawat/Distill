@@ -34,7 +34,7 @@ services:
     environment:
       - STORAGE_HOST=storage
       - STORAGE_PORT=50053
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318
     depends_on:
       - mongodb

@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.120.0",
+    "@google/generative-ai": "^0.24.1",
     "@grpc/grpc-js": "^1.14.4",
     "@grpc/proto-loader": "^0.8.1",
     "@opentelemetry/exporter-trace-otlp-http": "^0.221.0",

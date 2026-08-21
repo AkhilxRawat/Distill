@@ -33,8 +33,8 @@ helm upgrade --install vault hashicorp/vault \
   --wait
 
 echo ""
-echo "==> Waiting for the Vault pod to be ready..."
-kubectl rollout status statefulset/vault -n "${VAULT_NAMESPACE}" --timeout=120s
+echo "==> Vault pod status:"
+kubectl get pods -n "${VAULT_NAMESPACE}"
 
 echo ""
 echo "✅  Vault is running in-cluster at vault.${VAULT_NAMESPACE}.svc.cluster.local:8200"

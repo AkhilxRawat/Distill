@@ -101,7 +101,7 @@ bash vault/configure-k8s-auth.sh
 
 **What it does:**
 - Enables the `kubernetes` auth method in Vault
-- Configures it to validate against the cluster's own in-cluster API service (`https://kubernetes.default.svc`), using the CA cert read straight from Vault's own pod
+- Configures it to validate against the cluster's own in-cluster API service (`https://kubernetes.default.svc`), using the CA cert read from the node's local MicroK8s installation (`/var/snap/microk8s/current/certs/ca.crt`) — not via `kubectl exec`, which can hit the same node-IP/kubelet-cert mismatch documented below
 - Creates a Vault policy granting read access to `secret/distill/processing`
 - Creates a Vault role `distill-processing` bound to the VSO service account
 
@@ -162,6 +162,11 @@ kubectl get secret processing-secret -n distill-dev \
 ### VaultStaticSecret not syncing
 - Check the Vault policy allows the path: `vault policy read distill-processing-policy`
 - Verify the KV path exists: `vault kv get secret/distill/processing`
+
+### `kubectl port-forward` / `exec` fails with an x509 error like `certificate is valid for 10.10.10.X, not 192.168.2.X`
+This means the target pod's node has a mismatch between its registered `InternalIP` (`kubectl get node <name> -o jsonpath='{.status.addresses}'`) and what its kubelet serving certificate actually covers — the API server can't safely dial that node's kubelet for streaming operations (port-forward, exec, `logs -f`). Non-streaming operations (`get`, `describe`, plain `logs`) are unaffected.
+- **Quick workaround**: if the pod is on the node you're running commands from, bypass the kubelet-proxy path entirely — hit the pod's IP directly (`kubectl get pod <name> -o wide` for the IP) instead of using port-forward.
+- **Real fix**: pin `--node-ip` explicitly in that node's kubelet args (`/var/snap/microk8s/current/args/kubelet`) to its intended cluster-internal address, then restart `kubelite` (`sudo systemctl restart snap.microk8s.daemon-kubelite`) — one node at a time, verifying the cluster recovers before moving to the next.
 
 ---
 

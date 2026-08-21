@@ -19,29 +19,29 @@ set -euo pipefail
 export VAULT_ADDR="${VAULT_ADDR:-http://127.0.0.1:8200}"
 export VAULT_TOKEN="${VAULT_TOKEN:-root}"
 
-KUBE_CONTEXT="${KUBE_CONTEXT:-}"  # leave unset to use your current context
-VAULT_NAMESPACE="${VAULT_NAMESPACE:-vault}"
-VAULT_POD="${VAULT_POD:-vault-0}"
 VAULT_K8S_MOUNT="kubernetes"
 VAULT_POLICY_NAME="distill-processing-policy"
 VAULT_ROLE_NAME="distill-processing"
 
-KCTX_ARGS=()
-[ -n "${KUBE_CONTEXT}" ] && KCTX_ARGS=(--context="${KUBE_CONTEXT}")
+# The cluster CA cert used to validate service-account tokens. MicroK8s
+# keeps its own copy of it on every node's local filesystem, so read it
+# there directly rather than via `kubectl exec` into a pod — the exec/
+# port-forward path goes through the API server dialing back to that
+# pod's node's kubelet, which can fail TLS verification if the node's
+# registered address doesn't match its kubelet serving cert (a real,
+# separate issue we hit — see vault/README.md troubleshooting).
+MICROK8S_CA_CERT="${MICROK8S_CA_CERT:-/var/snap/microk8s/current/certs/ca.crt}"
 
 echo "==> Using Vault at ${VAULT_ADDR}"
 
 # ----- 1. Get Kubernetes cluster info for Vault -----
 # Vault now runs inside the same cluster it's protecting, so it
 # validates service-account tokens against the cluster's own
-# in-cluster API service — not an external host/IP. The CA cert
-# is read straight from Vault's own pod so it matches exactly
-# what Vault itself trusts.
+# in-cluster API service — not an external host/IP.
 K8S_HOST="https://kubernetes.default.svc"
 echo ""
-echo "==> Fetching Kubernetes CA cert from the Vault pod..."
-K8S_CA_CERT=$(kubectl ${KCTX_ARGS[@]+"${KCTX_ARGS[@]}"} exec -n "${VAULT_NAMESPACE}" "${VAULT_POD}" -- \
-  cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)
+echo "==> Reading Kubernetes CA cert from ${MICROK8S_CA_CERT}..."
+K8S_CA_CERT=$(cat "${MICROK8S_CA_CERT}")
 
 # ----- 2. Enable Kubernetes auth method -----
 echo ""

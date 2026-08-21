@@ -14,6 +14,19 @@ This document walks you through bringing up HashiCorp Vault **in-cluster** (dev 
 | `kubectl` | Connected to your target cluster (e.g. MicroK8s) |
 | `helm` | v3.x |
 
+> **Run this from a master node, not your laptop, if MicroK8s's API server certificate doesn't cover the IP you'd otherwise reach it over.** MicroK8s's self-signed cert only has SANs for `127.0.0.1` and its internal cluster IPs by default — connecting over the node's LAN IP from a remote machine fails TLS verification (`x509: certificate is valid for ..., not <your IP>`) unless that IP was added to the cert's SANs (`microk8s refresh-certs`). Simplest fix: SSH into a master node — `kubectl`/`helm` work there without any cert issue since it's local. On the node:
+> ```bash
+> sudo snap alias microk8s.kubectl kubectl
+> microk8s enable helm3
+> sudo snap alias microk8s.helm3 helm
+> ```
+> Then `git clone` (or `scp`) this repo onto the node and run the steps below from there. Vault CLI isn't bundled with MicroK8s — install via HashiCorp's apt repo (Ubuntu/Debian):
+> ```bash
+> wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+> echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+> sudo apt update && sudo apt install vault
+> ```
+
 ```bash
 # Verify your cluster is reachable
 kubectl get nodes

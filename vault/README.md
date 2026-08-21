@@ -103,11 +103,21 @@ bash vault/configure-k8s-auth.sh
 - Enables the `kubernetes` auth method in Vault
 - Configures it to validate against the cluster's own in-cluster API service (`https://kubernetes.default.svc`), using the CA cert read from the node's local MicroK8s installation (`/var/snap/microk8s/current/certs/ca.crt`) — not via `kubectl exec`, which can hit the same node-IP/kubelet-cert mismatch documented below
 - Creates a Vault policy granting read access to `secret/distill/processing`
-- Creates a Vault role `distill-processing` bound to the VSO service account
+- Creates a Vault role `distill-processing`, bound to a ServiceAccount named `vault-secrets-operator` **in the `distill-dev` namespace** — not VSO's own operator identity (see the note below)
 
 ---
 
-## Step 5 — Apply VSO Custom Resources
+## Step 5 — Create the ServiceAccount VSO Authenticates As
+
+VSO doesn't use its own pod identity to log in to Vault — for each `VaultAuth` resource, it mints a fresh token (via the Kubernetes `TokenRequest` API) for whatever ServiceAccount is named in that CR's `spec.kubernetes.serviceAccount` field, and that ServiceAccount must exist **in the same namespace as the `VaultAuth` resource itself**. `charts/vault/vault-auth.yaml` names it `vault-secrets-operator` — easy to mistake for VSO's own operator ServiceAccount (which lives in `vault-secrets-operator-system` and is unrelated), so create it explicitly:
+
+```bash
+kubectl create serviceaccount vault-secrets-operator -n distill-dev
+```
+
+---
+
+## Step 6 — Apply VSO Custom Resources
 
 ```bash
 kubectl apply -f charts/vault/
@@ -123,7 +133,7 @@ This applies three CRDs in the `distill-dev` namespace:
 
 ---
 
-## Step 6 — Verify
+## Step 7 — Verify
 
 ```bash
 # 1. VSO pod is running

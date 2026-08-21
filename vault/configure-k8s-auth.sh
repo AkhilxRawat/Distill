@@ -74,11 +74,17 @@ EOF
 echo "    Policy '${VAULT_POLICY_NAME}' created."
 
 # ----- 5. Create Vault role bound to Kubernetes service account -----
+# VSO mints a fresh token via the Kubernetes TokenRequest API for the
+# ServiceAccount named in the VaultAuth CR's spec.kubernetes.serviceAccount
+# field — NOT using VSO's own operator identity from
+# vault-secrets-operator-system. That ServiceAccount must exist in the same
+# namespace as the VaultAuth resource itself (distill-dev), which is why the
+# role below binds to that namespace, not VSO's own.
 echo ""
 echo "==> Creating Vault role '${VAULT_ROLE_NAME}'..."
 vault write "auth/${VAULT_K8S_MOUNT}/role/${VAULT_ROLE_NAME}" \
   bound_service_account_names="vault-secrets-operator" \
-  bound_service_account_namespaces="vault-secrets-operator-system" \
+  bound_service_account_namespaces="distill-dev" \
   policies="${VAULT_POLICY_NAME}" \
   ttl="24h"
 

@@ -26,8 +26,11 @@ spec:
     # Vault role that was created in configure-k8s-auth.sh
     role: distill-processing
 
-    # Service account used by VSO to authenticate
-    # VSO's own service account lives in vault-secrets-operator-system
+    # ServiceAccount VSO mints a fresh token for (via TokenRequest) to
+    # present as the login JWT to Vault. This is NOT VSO's own operator
+    # identity — it must exist in THIS namespace (distill-dev), created
+    # separately (see vault/README.md):
+    #   kubectl create serviceaccount vault-secrets-operator -n distill-dev
     serviceAccount: vault-secrets-operator
 
     # Audience for the projected service account token

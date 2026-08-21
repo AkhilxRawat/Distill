@@ -40,7 +40,7 @@ echo "==> Using Vault at ${VAULT_ADDR}"
 K8S_HOST="https://kubernetes.default.svc"
 echo ""
 echo "==> Fetching Kubernetes CA cert from the Vault pod..."
-K8S_CA_CERT=$(kubectl "${KCTX_ARGS[@]}" exec -n "${VAULT_NAMESPACE}" "${VAULT_POD}" -- \
+K8S_CA_CERT=$(kubectl ${KCTX_ARGS[@]+"${KCTX_ARGS[@]}"} exec -n "${VAULT_NAMESPACE}" "${VAULT_POD}" -- \
   cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)
 
 # ----- 2. Enable Kubernetes auth method -----

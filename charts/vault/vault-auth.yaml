@@ -35,6 +35,6 @@ spec:
     audiences:
       - vault
 
-  # How long Vault should cache the token before re-authenticating
-  # (must be ≤ the role's TTL configured in Vault)
-  tokenExpirationSeconds: 600
+    # How long Vault should cache the token before re-authenticating
+    # (must be ≤ the role's TTL configured in Vault)
+    tokenExpirationSeconds: 600

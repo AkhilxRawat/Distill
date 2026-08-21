@@ -1,6 +1,8 @@
-# Phase 4.2 — Vault + Vault Secrets Operator Runbook
+# Vault + Vault Secrets Operator Runbook
 
-This document walks you through bringing up HashiCorp Vault in dev mode, installing the Vault Secrets Operator (VSO), and verifying that Kubernetes secrets are automatically materialised from Vault.
+This document walks you through bringing up HashiCorp Vault **in-cluster** (dev mode), installing the Vault Secrets Operator (VSO), and verifying that Kubernetes secrets are automatically materialised from Vault.
+
+> Vault runs as a workload on the cluster itself (namespace `vault`), not on the host machine — this is the topology used for the Proxmox/MicroK8s deployment. If you just want to poke at Vault locally without touching the cluster, `start-vault-dev.sh` + `seed-secrets.sh` still start a plain host-mode Vault server, but that path is unrelated to what gets deployed.
 
 ---
 
@@ -9,9 +11,8 @@ This document walks you through bringing up HashiCorp Vault in dev mode, install
 | Tool | Install |
 |------|---------|
 | `vault` CLI | https://developer.hashicorp.com/vault/downloads |
-| `kubectl` | Connected to your `k3d-distill` cluster |
+| `kubectl` | Connected to your target cluster (e.g. MicroK8s) |
 | `helm` | v3.x |
-| `k3d` cluster | Running with `distill-dev` namespace |
 
 ```bash
 # Verify your cluster is reachable
@@ -21,30 +22,25 @@ kubectl get ns distill-dev
 
 ---
 
-## Step 1 — Add the HashiCorp Helm Repo
+## Step 1 — Install Vault In-Cluster
 
 ```bash
-helm repo add hashicorp https://helm.releases.hashicorp.com
-helm repo update
+bash vault/install-vault-incluster.sh
 ```
+
+**What it does:** Installs HashiCorp Vault via the official Helm chart into namespace `vault`, in dev mode (in-memory, auto-unsealed, root token `root`). Reachable in-cluster at `vault.vault.svc.cluster.local:8200` — this is the address already set in `charts/vault/vault-connection.yaml` and `charts/vso-values.yaml`.
+
+> Dev mode is **not persistent** — all secrets are lost if the pod restarts. Fine for getting the pipeline working end-to-end; revisit with a real storage backend + auto-unseal before this matters for an always-on deployment.
 
 ---
 
-## Step 2 — Start Vault Dev Server (Terminal 1)
+## Step 2 — Port-Forward and Seed Secrets
 
-> Keep this terminal open — Vault runs in the foreground.
-
-```bash
-bash vault/start-vault-dev.sh
-```
-
-**What it does:** Starts Vault in-memory dev mode, bound to `0.0.0.0:8200` with root token `root`. This makes it reachable from the k3d cluster nodes via `host.docker.internal:8200`.
-
----
-
-## Step 3 — Seed Secrets into Vault (Terminal 2)
+Vault only has a ClusterIP inside the cluster, so reach it from your machine with a port-forward for the one-time setup steps:
 
 ```bash
+kubectl port-forward -n vault svc/vault 8200:8200 &
+
 export VAULT_ADDR=http://127.0.0.1:8200
 export VAULT_TOKEN=root
 
@@ -63,7 +59,7 @@ This writes the following keys to `secret/distill/processing` in Vault:
 
 ---
 
-## Step 4 — Install Vault Secrets Operator (VSO)
+## Step 3 — Install Vault Secrets Operator (VSO)
 
 ```bash
 helm install vault-secrets-operator \
@@ -79,27 +75,26 @@ kubectl rollout status deployment/vault-secrets-operator-controller-manager \
 
 ---
 
-## Step 5 — Configure Kubernetes Auth in Vault
+## Step 4 — Configure Kubernetes Auth in Vault
 
-> Run after VSO is installed and the cluster is ready.
+> Run after VSO is installed and the cluster is ready. Keep the port-forward from Step 2 running (or restart it).
 
 ```bash
 export VAULT_ADDR=http://127.0.0.1:8200
 export VAULT_TOKEN=root
-export KUBE_CONTEXT=k3d-distill   # adjust if your context name differs
 
 bash vault/configure-k8s-auth.sh
 ```
 
 **What it does:**
 - Enables the `kubernetes` auth method in Vault
-- Configures it with your cluster's API server address and CA cert
+- Configures it to validate against the cluster's own in-cluster API service (`https://kubernetes.default.svc`), using the CA cert read straight from Vault's own pod
 - Creates a Vault policy granting read access to `secret/distill/processing`
 - Creates a Vault role `distill-processing` bound to the VSO service account
 
 ---
 
-## Step 6 — Apply VSO Custom Resources
+## Step 5 — Apply VSO Custom Resources
 
 ```bash
 kubectl apply -f charts/vault/
@@ -109,13 +104,13 @@ This applies three CRDs in the `distill-dev` namespace:
 
 | Resource | Name | Purpose |
 |----------|------|---------|
-| `VaultConnection` | `distill-vault-connection` | Points to `http://host.docker.internal:8200` |
+| `VaultConnection` | `distill-vault-connection` | Points to `http://vault.vault.svc.cluster.local:8200` (in-cluster) |
 | `VaultAuth` | `distill-vault-auth` | Kubernetes auth with role `distill-processing` |
 | `VaultStaticSecret` | `processing-secret-sync` | Syncs Vault secret → K8s Secret `processing-secret` |
 
 ---
 
-## Step 7 — Verify
+## Step 6 — Verify
 
 ```bash
 # 1. VSO pod is running
@@ -144,12 +139,12 @@ kubectl get secret processing-secret -n distill-dev \
 ## Troubleshooting
 
 ### VaultConnection not ready
-- Ensure Vault is running: `vault status`  
-- Confirm k3d nodes can reach the host: `kubectl run -it --rm debug --image=curlimages/curl --restart=Never -- curl http://host.docker.internal:8200/v1/sys/health`
+- Ensure the Vault pod is running: `kubectl get pods -n vault`
+- Confirm other pods can reach it in-cluster: `kubectl run -it --rm debug --image=curlimages/curl --restart=Never -- curl http://vault.vault.svc.cluster.local:8200/v1/sys/health`
 
 ### VaultAuth not ready
 - Check VSO logs: `kubectl logs -n vault-secrets-operator-system -l control-plane=controller-manager`
-- Re-run `configure-k8s-auth.sh` after confirming `kubectl config view` shows the right cluster
+- Re-run `configure-k8s-auth.sh` after confirming the port-forward to `vault.vault.svc` is still up
 
 ### VaultStaticSecret not syncing
 - Check the Vault policy allows the path: `vault policy read distill-processing-policy`
@@ -160,21 +155,21 @@ kubectl get secret processing-secret -n distill-dev \
 ## Architecture Diagram
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                     Host Machine                        │
-│                                                         │
-│  ┌──────────────────────────────────────────────────┐   │
-│  │  Vault Dev Server (0.0.0.0:8200)                 │   │
-│  │  secret/distill/processing                       │   │
-│  │    ├── GEMINI_API_KEY                            │   │
-│  │    ├── PROCESSING_LOG_LEVEL                      │   │
-│  │    └── PROCESSING_WORKERS                        │   │
-│  └──────────────────────────────────────────────────┘   │
-│                         ▲  http://host.docker.internal   │
+┌───────────────────────────────────────────────────────────┐
+│  Cluster (MicroK8s — 3 master / 3 worker, Proxmox)         │
+│                                                             │
+│  ┌──────────────────────────────────────────────────┐     │
+│  │  Namespace: vault                                  │     │
+│  │  Pod: vault-0 (dev mode, in-memory)               │     │
+│  │  secret/distill/processing                       │     │
+│  │    ├── GEMINI_API_KEY                            │     │
+│  │    ├── PROCESSING_LOG_LEVEL                      │     │
+│  │    └── PROCESSING_WORKERS                        │     │
+│  └──────────────────────────────────────────────────┘     │
+│                         ▲  vault.vault.svc.cluster.local   │
 └─────────────────────────│───────────────────────────────┘
                           │
 ┌─────────────────────────│───────────────────────────────┐
-│  k3d Cluster            │                               │
 │                         │                               │
 │  ┌──────────────────────┴─────────────────────────┐     │
 │  │  Namespace: vault-secrets-operator-system       │     │

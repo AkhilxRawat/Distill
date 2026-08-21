@@ -13,10 +13,10 @@ metadata:
   name: distill-vault-connection
   namespace: distill-dev
 spec:
-  # Address of the Vault server reachable from inside the cluster.
-  # Docker Desktop / k3d on Windows  → host.docker.internal
-  # Linux k3d (bridge network)       → <host LAN IP>, e.g. 172.17.0.1
-  address: "http://host.docker.internal:8200"
+  # Address of the Vault server. Vault runs in-cluster (namespace "vault",
+  # installed via the official Helm chart in dev mode) — this is the
+  # in-cluster Service DNS name, reachable from any namespace.
+  address: "http://vault.vault.svc.cluster.local:8200"
 
   # Skip TLS verification (Vault dev mode has no TLS)
   skipTLSVerify: false

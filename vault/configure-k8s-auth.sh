@@ -8,8 +8,9 @@
 #   bash vault/configure-k8s-auth.sh
 #
 # Prerequisites:
-#   - Vault dev server running
-#   - kubectl context pointing to k3d-distill cluster
+#   - Vault running in-cluster (install-vault-incluster.sh),
+#     reachable via `kubectl port-forward -n vault svc/vault 8200:8200`
+#   - kubectl pointed at the target cluster (e.g. MicroK8s)
 #   - VSO already installed in the cluster
 # ============================================================
 
@@ -18,27 +19,29 @@ set -euo pipefail
 export VAULT_ADDR="${VAULT_ADDR:-http://127.0.0.1:8200}"
 export VAULT_TOKEN="${VAULT_TOKEN:-root}"
 
-KUBE_CONTEXT="${KUBE_CONTEXT:-k3d-distill}"
+KUBE_CONTEXT="${KUBE_CONTEXT:-}"  # leave unset to use your current context
+VAULT_NAMESPACE="${VAULT_NAMESPACE:-vault}"
+VAULT_POD="${VAULT_POD:-vault-0}"
 VAULT_K8S_MOUNT="kubernetes"
 VAULT_POLICY_NAME="distill-processing-policy"
 VAULT_ROLE_NAME="distill-processing"
-K8S_NAMESPACE="distill-dev"
-K8S_SA_NAME="processing"  # service account name for the VSO binding
+
+KCTX_ARGS=()
+[ -n "${KUBE_CONTEXT}" ] && KCTX_ARGS=(--context="${KUBE_CONTEXT}")
 
 echo "==> Using Vault at ${VAULT_ADDR}"
-echo "==> Using kube context: ${KUBE_CONTEXT}"
 
 # ----- 1. Get Kubernetes cluster info for Vault -----
+# Vault now runs inside the same cluster it's protecting, so it
+# validates service-account tokens against the cluster's own
+# in-cluster API service — not an external host/IP. The CA cert
+# is read straight from Vault's own pod so it matches exactly
+# what Vault itself trusts.
+K8S_HOST="https://kubernetes.default.svc"
 echo ""
-echo "==> Fetching Kubernetes API endpoint..."
-K8S_HOST=$(kubectl --context="${KUBE_CONTEXT}" config view \
-  --minify -o jsonpath='{.clusters[0].cluster.server}')
-echo "    K8s Host: ${K8S_HOST}"
-
-echo "==> Fetching Kubernetes CA cert..."
-K8S_CA_CERT=$(kubectl --context="${KUBE_CONTEXT}" config view \
-  --raw --minify -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' \
-  | base64 --decode)
+echo "==> Fetching Kubernetes CA cert from the Vault pod..."
+K8S_CA_CERT=$(kubectl "${KCTX_ARGS[@]}" exec -n "${VAULT_NAMESPACE}" "${VAULT_POD}" -- \
+  cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)
 
 # ----- 2. Enable Kubernetes auth method -----
 echo ""

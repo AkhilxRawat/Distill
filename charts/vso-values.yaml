@@ -15,10 +15,9 @@
 defaultVaultConnection:
   # Set to true to enable the default connection.
   enabled: true
-  # Address of the Vault server reachable from inside the cluster.
-  # On Docker Desktop / k3d on Windows: host.docker.internal
-  # On Linux k3d: use the host's LAN IP, e.g. 172.17.0.1
-  address: "http://host.docker.internal:8200"
+  # Vault runs in-cluster (namespace "vault", official Helm chart, dev mode)
+  # — this is its in-cluster Service DNS name.
+  address: "http://vault.vault.svc.cluster.local:8200"
   # Skip TLS verification for the dev server (no TLS in dev mode)
   skipTLSVerify: false
 

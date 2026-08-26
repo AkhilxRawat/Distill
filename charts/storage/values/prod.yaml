@@ -8,3 +8,8 @@ resources:
   limits:
     memory: "512Mi"
     cpu: "500m"
+env:
+  # Points at a distill-mongodb-main release in the distill-main namespace —
+  # not deployed yet (see Step 6 / RAM discussion). storage-main will not
+  # connect until that's set up, same as its current state, not a regression.
+  MONGODB_URI: "mongodb://distill-mongodb-main-0.distill-mongodb-main.distill-main.svc.cluster.local:27017,distill-mongodb-main-1.distill-mongodb-main.distill-main.svc.cluster.local:27017,distill-mongodb-main-arbiter.distill-main.svc.cluster.local:27017/distill?replicaSet=rs0"

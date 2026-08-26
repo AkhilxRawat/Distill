@@ -1,13 +1,12 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ .Release.Name }}
   labels:
     app: mongodb
 spec:
+  serviceName: {{ .Release.Name }}
   replicas: {{ .Values.replicaCount }}
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: mongodb
@@ -16,10 +15,20 @@ spec:
       labels:
         app: mongodb
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values:
+                      - application
       containers:
         - name: mongodb
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["mongod", "--replSet", "{{ .Values.replicaSetName }}", "--bind_ip_all"]
           ports:
             - containerPort: 27017
           resources:
@@ -28,20 +37,20 @@ spec:
             - name: data
               mountPath: /data/db
           livenessProbe:
-            tcpSocket:
-              port: 27017
+            tcpSocket: { port: 27017 }
             initialDelaySeconds: 10
             periodSeconds: 30
           readinessProbe:
-            tcpSocket:
-              port: 27017
+            tcpSocket: { port: 27017 }
             initialDelaySeconds: 5
             periodSeconds: 10
-      volumes:
-        - name: data
-          {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Release.Name }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels: { app: mongodb }
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size }}

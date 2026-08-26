@@ -4,3 +4,5 @@ image:
 resources:
   limits:
     memory: "256Mi"
+env:
+  MONGODB_URI: "mongodb://distill-mongodb-0.distill-mongodb.distill-dev.svc.cluster.local:27017,distill-mongodb-1.distill-mongodb.distill-dev.svc.cluster.local:27017,distill-mongodb-arbiter.distill-dev.svc.cluster.local:27017/distill?replicaSet=rs0"

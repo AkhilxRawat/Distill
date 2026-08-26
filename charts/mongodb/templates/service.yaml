@@ -5,11 +5,10 @@ metadata:
   labels:
     app: mongodb
 spec:
-  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: mongodb
   ports:
     - name: mongodb
       port: {{ .Values.service.port }}
       targetPort: 27017
-      protocol: TCP
-  selector:
-    app: mongodb

@@ -20,6 +20,10 @@ resources:
     memory: 256Mi
     cpu: 200m
 
+# MONGODB_URI is intentionally NOT set here — it must point at a
+# different namespace's MongoDB replica set per environment, and is
+# set explicitly in values/dev.yaml and values/prod.yaml instead.
+# (Previously hardcoded to distill-dev here, which meant distill-main's
+# storage would have silently connected to dev's database.)
 env:
-  MONGODB_URI: "mongodb://mongodb.distill-dev.svc.cluster.local:27017/distill"
   OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo.observability.svc.cluster.local:4318"

@@ -241,6 +241,27 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  name: distill-mongodb
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/mongodb
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   name: distill-tempo
   namespace: argocd
 spec:

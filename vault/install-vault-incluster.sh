@@ -14,6 +14,12 @@
 # Note: dev mode is NOT persistent — all secrets are lost on pod
 # restart. Fine for getting the pipeline working; revisit with a
 # real storage backend + auto-unseal before this matters in prod.
+#
+# injector.enabled=false: this project uses the Vault Secrets
+# Operator (VSO) to sync secrets into native K8s Secrets, not the
+# Agent Injector's sidecar-injection approach — the injector pod
+# would just be an idle, unused extra ~46Mi on a resource-tight
+# cluster.
 # ============================================================
 
 set -euo pipefail
@@ -30,6 +36,7 @@ helm upgrade --install vault hashicorp/vault \
   --create-namespace \
   --set "server.dev.enabled=true" \
   --set "server.dev.devRootToken=root" \
+  --set "injector.enabled=false" \
   --wait
 
 echo ""

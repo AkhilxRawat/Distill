@@ -9,7 +9,10 @@
 
 prometheus:
   prometheusSpec:
-    retention: 12h
+    # Shorter retention = fewer in-memory time-series chunks — this
+    # cluster is memory-constrained (2-3GB/node), and 12h of data was
+    # keeping Prometheus close to its memory limit at all times.
+    retention: 6h
     resources:
       requests: { cpu: 100m, memory: 256Mi }
       limits: { memory: 512Mi }

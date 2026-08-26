@@ -13,6 +13,7 @@ prometheus:
     # cluster is memory-constrained (2-3GB/node), and 12h of data was
     # keeping Prometheus close to its memory limit at all times.
     retention: 6h
+    retentionSize: "400MB"
     resources:
       requests: { cpu: 100m, memory: 256Mi }
       limits: { memory: 512Mi }
@@ -23,6 +24,7 @@ prometheus:
     ruleSelectorNilUsesHelmValues: false
 
 alertmanager:
+  enabled: false
   alertmanagerSpec:
     resources:
       requests: { cpu: 50m, memory: 64Mi }
@@ -30,7 +32,7 @@ alertmanager:
 
 grafana:
   adminPassword: "distill-admin"
-  defaultDashboardsEnabled: true
+  defaultDashboardsEnabled: false
   resources:
     requests: { cpu: 50m, memory: 128Mi }
     limits: { memory: 256Mi }
@@ -45,7 +47,7 @@ grafana:
     dashboards:
       enabled: true
       label: grafana_dashboard
-      searchNamespace: ALL
+      searchNamespace: observability
     datasources:
       # Every service's histograms carry a `trace_id` exemplar label
       # (see services/*/src/metrics.js — `timer(undefined, { trace_id })`).

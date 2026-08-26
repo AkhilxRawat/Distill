@@ -13,8 +13,7 @@ service:
 persistence:
   enabled: true
   size: 1Gi
-  storageClassName: standard
-
+  storageClassName: microk8s-hostpath
 resources:
   requests:
     memory: 256Mi

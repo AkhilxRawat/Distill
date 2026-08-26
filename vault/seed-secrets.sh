@@ -13,7 +13,7 @@
 
 set -euo pipefail
 
-export VAULT_ADDR="${VAULT_ADDR:-http://127.0.0.1:8200}"
+export VAULT_ADDR="${VAULT_ADDR:-http://127.0.0.1:8200}" 
 export VAULT_TOKEN="${VAULT_TOKEN:-root}"
 
 echo "==> Connected to Vault at ${VAULT_ADDR}"

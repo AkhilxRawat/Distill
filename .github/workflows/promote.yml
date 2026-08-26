@@ -20,10 +20,21 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Promote dev tag(s) to prod
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Promote dev image(s) to prod
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -34,8 +45,17 @@ jobs:
           fi
 
           for svc in $services; do
-            tag=$(yq '.image.tag' "charts/$svc/values/dev.yaml")
-            yq -i ".image.tag = \"$tag\"" "charts/$svc/values/prod.yaml"
+            dev_tag=$(yq '.image.tag' "charts/$svc/values/dev.yaml")
+            # dev_tag looks like "dev-<sha>" — reuse the same sha, just
+            # relabel it as "prod-<sha>". This retags the exact same
+            # image already tested in dev — it does NOT rebuild it.
+            sha="${dev_tag#dev-}"
+            prod_tag="prod-${sha}"
+            image="ghcr.io/akhilxrawat/distill-${svc}"
+
+            docker buildx imagetools create -t "${image}:${prod_tag}" "${image}:${dev_tag}"
+
+            yq -i ".image.tag = \"${prod_tag}\"" "charts/$svc/values/prod.yaml"
             git add "charts/$svc/values/prod.yaml"
           done
 

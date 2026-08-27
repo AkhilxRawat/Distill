@@ -1,0 +1,32 @@
+# ============================================================
+# charts/vault/vault-auth-main.yaml
+#
+# VaultAuth CRD for distill-main (prod). Uses its OWN Vault role
+# ("distill-processing-main"), not dev's "distill-processing" —
+# same isolation principle as storage's per-env MONGODB_URI:
+# prod must never be able to silently read dev's secret path.
+#
+# The role is created by vault/configure-k8s-auth-main.sh
+# (mirrors configure-k8s-auth.sh for dev).
+# ============================================================
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: distill-vault-auth
+  namespace: distill-main
+spec:
+  vaultConnectionRef: distill-vault-connection
+  method: kubernetes
+  mount: kubernetes
+
+  kubernetes:
+    role: distill-processing-main
+
+    # Must exist in THIS namespace (distill-main), created separately:
+    #   kubectl create serviceaccount vault-secrets-operator -n distill-main
+    serviceAccount: vault-secrets-operator
+
+    audiences:
+      - vault
+
+    tokenExpirationSeconds: 600

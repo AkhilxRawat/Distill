@@ -1,0 +1,16 @@
+# ============================================================
+# charts/vault/vault-connection-main.yaml
+#
+# VaultConnection CRD for the distill-main (prod) namespace.
+# Identical to charts/vault/vault-connection.yaml but must live
+# in distill-main — VSO resources are only visible to workloads
+# in their own namespace.
+# ============================================================
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultConnection
+metadata:
+  name: distill-vault-connection
+  namespace: distill-main
+spec:
+  address: "http://vault.vault.svc.cluster.local:8200"
+  skipTLSVerify: false

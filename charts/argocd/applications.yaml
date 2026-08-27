@@ -54,7 +54,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/AkhilxRawat/Distill
+    repoURL: https://github.com/AkhilxRawat/Distill 
     targetRevision: main
     path: charts/processing
     helm:
@@ -252,6 +252,32 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: distill-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  # Release name "distill-mongodb-main" — matches the connection string
+  # already set in charts/storage/values/prod.yaml
+  # (distill-mongodb-main-0/-1/-arbiter.distill-main.svc...). Same chart
+  # as dev's distill-mongodb, just a different namespace/release name —
+  # the chart templates are namespace-agnostic (.Release.Namespace).
+  name: distill-mongodb-main
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkhilxRawat/Distill
+    targetRevision: main
+    path: charts/mongodb
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distill-main
   syncPolicy:
     automated:
       prune: true

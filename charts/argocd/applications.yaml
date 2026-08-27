@@ -328,16 +328,28 @@ kind: Application
 metadata:
   name: metallb
   namespace: argocd
+  annotations:
+    # ArgoCD's bundled schema lacks Deployment/DaemonSet .status.terminatingReplicas,
+    # which breaks the structured-merge (server-side) diff. Apply server-side, diff client-side.
+    argocd.argoproj.io/compare-options: ServerSideDiff=false
 spec:
   project: default
   source:
     repoURL: https://metallb.github.io/metallb
     chart: metallb
     targetRevision: 0.16.1
+    helm:
+      # Pure L2 mode — no BGP. Drop the heavy FRR-k8s DaemonSet (5 containers/node)
+      # that chart 0.16 enables by default; this cluster is memory-constrained.
+      values: |
+        frrk8s:
+          enabled: false
+        speaker:
+          frr:
+            enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: metallb-system
-
   syncPolicy:
     automated:
       prune: true

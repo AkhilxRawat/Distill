@@ -1,0 +1,6 @@
+apiVersion: v2
+name: metallb-config
+description: MetalLB L2 address pool and advertisement for the Proxmox cluster
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

@@ -1,0 +1,3 @@
+poolName: distill-pool
+addresses:
+  - 10.10.10.240-10.10.10.245

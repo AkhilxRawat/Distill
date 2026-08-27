@@ -1,4 +1,4 @@
-replicaCount: 2
+replicaCount: 1
 image:
   tag: "latest" # placeholder — must be set via the promote workflow before this is used for real
 resources:

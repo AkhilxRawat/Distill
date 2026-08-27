@@ -333,7 +333,7 @@ spec:
   source:
     repoURL: https://metallb.github.io/metallb
     chart: metallb
-    targetRevision: <version from Step A>
+    targetRevision: 0.16.1
   destination:
     server: https://kubernetes.default.svc
     namespace: metallb-system

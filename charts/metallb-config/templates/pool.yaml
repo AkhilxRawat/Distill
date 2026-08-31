@@ -16,3 +16,5 @@ metadata:
 spec:
   ipAddressPools:
     - {{ .Values.poolName }}
+  interfaces:
+    - eth1

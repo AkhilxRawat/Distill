@@ -12,12 +12,12 @@ service:
 ingress:
   enabled: true
   className: nginx
-  host: distill.localhost
+  host: app.distill
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-issuer
   tls:
     - hosts:
-        - distill.localhost
+        - app.distill
       secretName: distill-frontend-tls
 
 resources:
@@ -29,4 +29,4 @@ resources:
     cpu: 200m
 
 env:
-  NEXT_PUBLIC_API_URL: "https://distill.localhost"
+  NEXT_PUBLIC_API_URL: "https://api.distill"

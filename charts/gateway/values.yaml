@@ -15,13 +15,13 @@ serviceMonitor:
 ingress:
   enabled: true
   className: nginx
-  host: distill.localhost
+  host: api.distill
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-issuer
     nginx.ingress.kubernetes.io/websocket-services: gateway
   tls:
     - hosts:
-        - distill.localhost
+        - api.distill
       secretName: distill-gateway-tls
 
 resources:

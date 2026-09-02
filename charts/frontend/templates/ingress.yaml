@@ -11,6 +11,23 @@ spec:
     - host: {{ .Values.ingress.host }}
       http:
         paths:
+          # Same-origin proxy: the frontend calls /api/* and /ws as relative
+          # paths (see frontend/src/lib/api.ts), so route those to the gateway
+          # here — the equivalent of nginx/nginx.conf in the compose setup.
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.ingress.gatewayService }}
+                port:
+                  number: {{ .Values.ingress.gatewayPort }}
+          - path: /ws
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.ingress.gatewayService }}
+                port:
+                  number: {{ .Values.ingress.gatewayPort }}
           - path: /
             pathType: Prefix
             backend:

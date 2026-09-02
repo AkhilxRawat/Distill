@@ -13,14 +13,19 @@ ingress:
   enabled: true
   className: nginx
   host: app.distill
+  # /api and /ws on this host are proxied to the gateway Service (see
+  # templates/ingress.yaml). Release name of charts/gateway in this namespace.
+  gatewayService: distill-gateway-main
+  gatewayPort: 3000
   annotations:
-    cert-manager.io/cluster-issuer: distill-ca-issuer      
+    cert-manager.io/cluster-issuer: distill-ca-issuer
+    # Keep long-lived /ws job-stream connections from being cut at 60s.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
   tls:
     - hosts:
         - app.distill
       secretName: distill-frontend-tls
-env:
-  NEXT_PUBLIC_API_URL: "https://api.distill"               
 
 resources:
   requests:
@@ -30,5 +35,7 @@ resources:
     memory: 256Mi
     cpu: 200m
 
-env:
-  NEXT_PUBLIC_API_URL: "https://api.distill"
+# The frontend makes same-origin relative API calls (baseURL unset), so no
+# NEXT_PUBLIC_API_URL is needed — and it would be baked at build time anyway,
+# not read from here.
+env: {}

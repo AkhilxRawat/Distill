@@ -12,7 +12,7 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      app: ingestion
+      app: {{ .Release.Name }}
   endpoints:
     - port: metrics
       path: /metrics

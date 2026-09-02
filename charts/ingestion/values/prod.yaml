@@ -8,3 +8,10 @@ resources:
   limits:
     memory: "512Mi"
     cpu: "500m"
+
+# Base values.yaml points these at *.distill-dev; in prod every service
+# runs in this same namespace (distill-main), addressed by release name.
+env:
+  STORAGE_HOST: distill-storage-main
+  PROCESSING_HOST: distill-processing-main
+  GATEWAY_URL: "http://distill-gateway-main:3000"

@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}
   labels:
-    app: ingestion
+    app: {{ .Release.Name }}
 spec:
   type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
@@ -16,4 +16,4 @@ spec:
       targetPort: 9092
       protocol: TCP
   selector:
-    app: ingestion
+    app: {{ .Release.Name }}

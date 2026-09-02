@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cert-config
+description: Private CA and ClusterIssuer for Distill internal TLS
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

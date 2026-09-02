@@ -18,7 +18,7 @@ ingress:
   host: api.distill
   annotations:
     cert-manager.io/cluster-issuer: distill-ca-issuer
-    nginx.ingress.kubernetes.io/websocket-services: gateway
+    nginx.ingress.kubernetes.io/websocket-services: distill-gateway-main
   tls:
     - hosts:
         - api.distill

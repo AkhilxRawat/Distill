@@ -25,6 +25,9 @@ alertmanager:
 grafana:
   adminPassword: "distill-admin"
   defaultDashboardsEnabled: false
+  grafana.ini:
+    server:
+      root_url: "https://grafana.distill"
   resources:
     requests: { cpu: 50m, memory: 128Mi }
     limits: { memory: 256Mi }
@@ -34,7 +37,11 @@ grafana:
     hosts:
       - grafana.distill
     annotations:
-      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      cert-manager.io/cluster-issuer: distill-ca-issuer
+    tls:
+      - hosts:
+          - grafana.distill
+        secretName: distill-grafana-tls
   sidecar:
     dashboards:
       enabled: true

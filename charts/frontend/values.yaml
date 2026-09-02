@@ -14,11 +14,13 @@ ingress:
   className: nginx
   host: app.distill
   annotations:
-    cert-manager.io/cluster-issuer: selfsigned-issuer
+    cert-manager.io/cluster-issuer: distill-ca-issuer      
   tls:
     - hosts:
         - app.distill
       secretName: distill-frontend-tls
+env:
+  NEXT_PUBLIC_API_URL: "https://api.distill"               
 
 resources:
   requests:
